@@ -83,8 +83,8 @@ router.post('/login', (req, res, next) => {
             role: user.role
           };
           const token = auth.sign(info);
-          auth.addRedis(token, {user: u.username, role: user.role});
-          console.log("用户登入: " + u.username);
+          auth.addRedis(user.username, "token", token);
+          auth.addRedis(user.username, "role", user.role);
           res.send({
             status: 200,
             token: token,
@@ -103,17 +103,12 @@ router.post('/login', (req, res, next) => {
 });
 
 router.post('/logout', (req, res, next) => {
-  auth.removeRedis(req);
-  console.log("用户登出: " + req.user.username);
+  auth.removeRedis(req.user.name);
   res.send({
     status: 200,
     message: "注销成功"
   })
 });
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
 
 module.exports = router;

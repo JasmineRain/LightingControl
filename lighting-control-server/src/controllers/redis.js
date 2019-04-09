@@ -12,20 +12,24 @@ redisClient.on('ready', function(res){
 });
 
 module.exports =  {
-  add(key, value) {
-    redisClient.set(key, value, redis.print);
-    redisClient.expire(key, expire)
+
+  add(key, field, value) {
+    redisClient.hset(key, field, value);
+    redisClient.expire(key, expire);
   },
+
   updateExpire(key) {
-    redisClient.expire(key, expire)
+    redisClient.expire(key, expire);
   },
-  get(key,callback) {
-    redisClient.get(key,(err,data)=>{
+
+  get(key, field, callback) {
+    redisClient.hget(key, field, (err, data) => {
       if(err)
         console.log(err);
       callback(data)
     })
   },
+
   remove(key){
     redisClient.del(key)
   }

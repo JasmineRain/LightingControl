@@ -20,13 +20,12 @@ const auth = {
     return jwt.sign(user, SECRET);
   },
 
-  addRedis: (token, info) => {
-    redis.add(token, info);
+  addRedis: (key, filed, value) => {
+    redis.add(key, filed, value);
   },
 
-  removeRedis: req => {
-    let token = getToken(req);
-    token && redis.remove(token);
+  removeRedis: key => {
+    key && redis.remove(key);
   },
 
   jwtCheck: express_jwt({
@@ -46,15 +45,17 @@ const auth = {
   },
 
   redisCheck: (req, res, next) => {
-    const token = getToken(req);
-    redis.get(token, data => {
-      if (data) {
-        redis.updateExpire(token);
+    let key = req.user.name;
+    let field = "token";
+    let token = getToken(req);
+    redis.get(key, field, data => {
+      if (data && data === token) {
+        redis.updateExpire(key);
         next();
       } else {
         res.send({
           status: 400,
-          message: "登陆超时，请重新登陆"
+          message: "无效口令，请重新登陆"
         })
       }
     })
