@@ -1,52 +1,97 @@
 <template>
   <div class="content">
+    <Wxc-loading :show="loading" :need-mask="true" type="trip"></Wxc-loading>
     <div class="logo">
       <image style="width: 138px; height: 138px" :src="bulbSrc"></image>
     </div>
     <div class="input-panel">
       <div class="row">
-        <input class="input" type="text" placeholder="账号" style="placeholder-color: #b0b0b0"/>
+        <input @change="setUsername" class="input" type="text" placeholder="账号" style="placeholder-color: #b0b0b0"/>
         <image style="width: 35px; height: 35px" :src="deleteSrc"></image>
       </div>
       <div class="row">
-        <input class="input" type="password" placeholder="密码" style="placeholder-color: #b0b0b0"/>
+        <input @change="setPassword" class="input" type="password" placeholder="密码" style="placeholder-color: #b0b0b0"/>
         <image style="width: 35px; height: 35px" :src="deleteSrc"></image>
       </div>
     </div>
     <div class="submit">
       <div class="btn">
-        <WxcButton text="登陆" type="blue" :btn-style="styles.logBtn" @wxcButtonClicked="login"></WxcButton>
+        <WxcButton text="登陆" type="blue" :btn-style="{width: '450px',height: '70px'}" @wxcButtonClicked="login"></WxcButton>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import { WxcButton } from 'weex-ui';
+  import { WxcButton, WxcLoading } from 'weex-ui';
   const modal = weex.requireModule('modal');
-  const toast = message => {
-    modal.toast({
-      message,
-      duration: 1,
-    });
-  };
+  const stream = weex.requireModule('stream');
+  const storage = weex.requireModule('storage');
+
   export default {
     data() {
       return {
-        styles: {
-          logBtn: {
-            width: '450px',
-            height: '70px'
-          }
-        }
+        username: '',
+        password: '',
+        loading: false,
+        address: 'http://127.0.0.1',
+        port: 3000
       }
     },
     name: "login",
-    components: {WxcButton},
+    components: {WxcButton, WxcLoading},
     methods: {
+      setUsername: function (e) {
+        this.username = e.value;
+      },
+      setPassword: function (e) {
+        this.password = e.value;
+      },
       login: function () {
-        toast('login button clicked');
-        this.$router.push('/home')
+        if(this.username ==='' || this.password === '') {
+          modal.toast({
+            message: '账号名或密码不能为空',
+            duration: 2
+          });
+          return;
+        }
+        if(this.loading)
+          return;
+        this.loading = true;
+        const body = JSON.stringify({username: this.username, password: this.password});
+        stream.fetch({
+          method: 'POST',
+          url: this.address + ':' + this.port + '/users/login',
+          type: 'json',
+          body: body,
+          headers: {'Content-Type': 'application/json'}
+        }, (res) => {
+          this.loading = false;
+          if(!res.ok){
+            modal.toast({
+              message: '请检查网络连接',
+              duration: 2
+            });
+          }
+          else{
+            if(res.data.status === 200) {
+              modal.toast({
+                message: '登陆成功',
+                duration: 2
+              });
+              storage.setItem('token', res.data.token, event => {
+                this.$router.push('/home');
+              });
+
+            }
+            else{
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
+          }
+        });
       }
     },
     computed: {
@@ -82,10 +127,11 @@
   }
   .content {
     position: absolute;
-    top: 150px;
+    top: 0;
     bottom: 0;
     left: 0;
     right: 0;
+    padding-top: 150px;
     display: flex;
     align-items: center;
     justify-content: flex-start;

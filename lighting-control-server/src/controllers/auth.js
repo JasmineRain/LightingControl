@@ -54,7 +54,7 @@ const auth = {
         next();
       } else {
         res.send({
-          status: 400,
+          status: 401,
           message: "无效口令，请重新登陆"
         })
       }

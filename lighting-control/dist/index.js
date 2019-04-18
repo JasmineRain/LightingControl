@@ -88,50 +88,7 @@ Object.defineProperty(exports, 'default', {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __vue_exports__, __vue_options__
-var __vue_styles__ = []
-
-/* styles */
-__vue_styles__.push(__webpack_require__(22)
-)
-
-/* script */
-__vue_exports__ = __webpack_require__(23)
-
-/* template */
-var __vue_template__ = __webpack_require__(33)
-__vue_options__ = __vue_exports__ = __vue_exports__ || {}
-if (
-  typeof __vue_exports__.default === "object" ||
-  typeof __vue_exports__.default === "function"
-) {
-if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
-__vue_options__ = __vue_exports__ = __vue_exports__.default
-}
-if (typeof __vue_options__ === "function") {
-  __vue_options__ = __vue_options__.options
-}
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\components\\nav.vue"
-__vue_options__.render = __vue_template__.render
-__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
-__vue_options__._scopeId = "data-v-6bfeffe3"
-__vue_options__.style = __vue_options__.style || {}
-__vue_styles__.forEach(function (module) {
-  for (var name in module) {
-    __vue_options__.style[name] = module[name]
-  }
-})
-if (typeof __register_static_styles__ === "function") {
-  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
-}
-
-module.exports = __vue_exports__
-
-
-/***/ }),
+/* 1 */,
 /* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -180,7 +137,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\components\\login.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\src\\components\\login.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-38a5e929"
@@ -3942,7 +3899,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\components\\lightings.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\src\\components\\lightings.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-84c3d4b2"
@@ -4052,13 +4009,7 @@ module.exports = {
     "justifyContent": "space-between",
     "alignItems": "flex-start",
     "flexDirection": "row"
-  },
-  "@FONT-FACE": [
-    {
-      "fontFamily": "iconfont",
-      "src": "url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.eot?#iefix') format('embedded-opentype'),\n  url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.woff2') format('woff2'),\n  url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.woff') format('woff'),\n  url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.ttf') format('truetype'),\n  url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.svg#iconfont') format('svg')"
-    }
-  ]
+  }
 }
 
 /***/ }),
@@ -4072,16 +4023,26 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _wxcLoading = __webpack_require__(51);
+
+var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
+
+var _wxcMinibar = __webpack_require__(2);
+
+var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
+
 var _floatButton = __webpack_require__(11);
 
 var _floatButton2 = _interopRequireDefault(_floatButton);
 
-var _nav = __webpack_require__(1);
-
-var _nav2 = _interopRequireDefault(_nav);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var modal = weex.requireModule('modal'); //
+//
+//
+//
+//
+//
 //
 //
 //
@@ -4128,7 +4089,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 //
 
-var dom = weex.requireModule('dom');
+var stream = weex.requireModule('stream');
+var storage = weex.requireModule('storage');
 exports.default = {
   name: "lightings",
   data: function data() {
@@ -4181,11 +4143,15 @@ exports.default = {
         row: 5, col: 6, value: 2
       }, {
         row: 6, col: 4, value: 3
-      }] //模拟灯光数据
+      }], //模拟灯光数据
+      loading: true,
+      address: 'http://127.0.0.1',
+      port: 3000,
+      token: ''
     };
   },
 
-  components: { floatButton: _floatButton2.default, Nav: _nav2.default },
+  components: { floatButton: _floatButton2.default, WxcMinibar: _wxcMinibar2.default, WxcLoading: _wxcLoading2.default },
   methods: {
     calc: function calc(data) {
       var rmax = 0;
@@ -4197,7 +4163,56 @@ exports.default = {
         }
       });
       return { row: rmax, col: cmax };
+    },
+
+    minibarLeftButtonClick: function minibarLeftButtonClick() {
+      console.log("click back at home page");
+    },
+
+    getLightsInfo: function getLightsInfo() {
+      var _this = this;
+
+      this.loading = true;
+      storage.getItem('token', function (event) {
+        console.log('get value:', event.data);
+        _this.token = event.data;
+      });
+      stream.fetch({
+        method: 'GET',
+        url: this.address + ':' + this.port + '/lights/info',
+        type: 'json',
+        headers: { 'Authorization': "Bearer " + this.token }
+      }, function (res) {
+        _this.loading = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 2
+          });
+        } else {
+          console.log(res.data);
+          if (res.data.status === 200) {
+            modal.toast({
+              message: '获取灯光信息',
+              duration: 2
+            });
+            //更新灯光信息
+          } else if (res.data.status === 401) {
+            modal.toast({
+              message: '登陆超时,请重新登陆',
+              duration: 1
+            });
+            _this.$router.push('/login');
+          } else {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+          }
+        }
+      });
     }
+
     // handleTableRowScroll: function (e) {
     //   let c = this.$refs.col1;
     //   dom.scrollToElement(c, {offset: e.contentOffset.x - 20});
@@ -4265,6 +4280,9 @@ exports.default = {
           return "local://img_control.png";
       }
     }
+  },
+  mounted: function mounted() {
+    this.getLightsInfo();
   }
 };
 
@@ -4297,7 +4315,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\components\\floatButton.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\src\\components\\floatButton.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-577f71ee"
@@ -4379,19 +4397,26 @@ var modal = weex.requireModule('modal'); //
 //
 //
 
-var toast = function toast(message) {
-  modal.toast({
-    message: message,
-    duration: 1
-  });
-};
+var storage = weex.requireModule('storage');
+
 exports.default = {
   components: { WxcIcon: _wxcIcon2.default },
   name: "menu",
   methods: {
     handleClick: function handleClick() {
-      toast('float button clicked');
-      this.$router.push('/new');
+      var _this = this;
+
+      storage.getItem('token', function (event) {
+        var role = JSON.parse(atob(event.data.split('.')[1])).role;
+        if (role >= 50) {
+          _this.$router.push('/new');
+        } else {
+          modal.toast({
+            message: '权限不足',
+            duration: 1
+          });
+        }
+      });
     }
   }
 };
@@ -4445,7 +4470,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-icon\\index.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-icon\\index.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-12c9d709"
@@ -4643,65 +4668,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 module.exports.render._withStripped = true
 
 /***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-module.exports = {}
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _wxcMinibar = __webpack_require__(2);
-
-var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
-
-var _wxcButton = __webpack_require__(0);
-
-var _wxcButton2 = _interopRequireDefault(_wxcButton);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-var modal = weex.requireModule('modal'); //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-exports.default = {
-  name: "nav",
-  data: function data() {
-    return {
-      styles: {
-        bar: {
-          height: '80px'
-        }
-      }
-    };
-  },
-
-  components: { WxcButton: _wxcButton2.default, WxcMinibar: _wxcMinibar2.default },
-  methods: {
-    minibarLeftButtonClick: function minibarLeftButtonClick() {
-      modal.toast({ 'message': 'click leftButton!', 'duration': 1 });
-    }
-  }
-};
-
-/***/ }),
+/* 22 */,
+/* 23 */,
 /* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4728,7 +4696,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-minibar\\index.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-minibar\\index.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-e026d130"
@@ -5024,7 +4992,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-button\\index.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-button\\index.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-77c133fc"
@@ -5256,34 +5224,32 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 module.exports.render._withStripped = true
 
 /***/ }),
-/* 33 */
-/***/ (function(module, exports) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', [_c('Wxc-Minibar', {
-    attrs: {
-      "title": "教室",
-      "backgroundColor": "#009ff0",
-      "textColor": "#FFFFFF",
-      "barStyle": _vm.styles.bar
-    },
-    on: {
-      "wxcMinibarLeftButtonClicked": _vm.minibarLeftButtonClick
-    }
-  })], 1)
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-
-/***/ }),
+/* 33 */,
 /* 34 */
 /***/ (function(module, exports) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: ["lighting"]
-  }, [_c('div', {
+  }, [_c('Wxc-loading', {
+    attrs: {
+      "show": _vm.loading,
+      "needMask": true,
+      "type": "trip"
+    }
+  }), _c('div', {
     staticClass: ["nav"]
-  }, [_c('Nav')], 1), _c('div', {
+  }, [_c('Wxc-Minibar', {
+    attrs: {
+      "title": "教室1",
+      "backgroundColor": "#009ff0",
+      "textColor": "#FFFFFF",
+      "leftButton": "",
+      "barStyle": {
+        height: '80px'
+      }
+    }
+  })], 1), _c('div', {
     staticClass: ["bulb"]
   }, [_vm._m(0), _c('div', {
     staticClass: ["dis_info"]
@@ -5377,10 +5343,11 @@ module.exports = {
   },
   "content": {
     "position": "absolute",
-    "top": "150",
+    "top": 0,
     "bottom": 0,
     "left": 0,
     "right": 0,
+    "paddingTop": "150",
     "display": "flex",
     "alignItems": "center",
     "justifyContent": "flex-start"
@@ -5449,6 +5416,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _wxcLoading = __webpack_require__(51);
+
+var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
+
 var _wxcButton = __webpack_require__(0);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
@@ -5478,31 +5449,74 @@ var modal = weex.requireModule('modal'); //
 //
 //
 //
+//
 
-var toast = function toast(message) {
-  modal.toast({
-    message: message,
-    duration: 1
-  });
-};
+var stream = weex.requireModule('stream');
+var storage = weex.requireModule('storage');
+
 exports.default = {
   data: function data() {
     return {
-      styles: {
-        logBtn: {
-          width: '450px',
-          height: '70px'
-        }
-      }
+      username: '',
+      password: '',
+      loading: false,
+      address: 'http://127.0.0.1',
+      port: 3000
     };
   },
 
   name: "login",
-  components: { WxcButton: _wxcButton2.default },
+  components: { WxcButton: _wxcButton2.default, WxcLoading: _wxcLoading2.default },
   methods: {
+    setUsername: function setUsername(e) {
+      this.username = e.value;
+    },
+    setPassword: function setPassword(e) {
+      this.password = e.value;
+    },
     login: function login() {
-      toast('login button clicked');
-      this.$router.push('/home');
+      var _this = this;
+
+      if (this.username === '' || this.password === '') {
+        modal.toast({
+          message: '账号名或密码不能为空',
+          duration: 2
+        });
+        return;
+      }
+      if (this.loading) return;
+      this.loading = true;
+      var body = JSON.stringify({ username: this.username, password: this.password });
+      stream.fetch({
+        method: 'POST',
+        url: this.address + ':' + this.port + '/users/login',
+        type: 'json',
+        body: body,
+        headers: { 'Content-Type': 'application/json' }
+      }, function (res) {
+        _this.loading = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 2
+          });
+        } else {
+          if (res.data.status === 200) {
+            modal.toast({
+              message: '登陆成功',
+              duration: 2
+            });
+            storage.setItem('token', res.data.token, function (event) {
+              _this.$router.push('/home');
+            });
+          } else {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+          }
+        }
+      });
     }
   },
   computed: {
@@ -5536,7 +5550,13 @@ exports.default = {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: ["content"]
-  }, [_c('div', {
+  }, [_c('Wxc-loading', {
+    attrs: {
+      "show": _vm.loading,
+      "needMask": true,
+      "type": "trip"
+    }
+  }), _c('div', {
     staticClass: ["logo"]
   }, [_c('image', {
     staticStyle: {
@@ -5558,6 +5578,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "type": "text",
       "placeholder": "账号"
+    },
+    on: {
+      "change": _vm.setUsername
     }
   }), _c('image', {
     staticStyle: {
@@ -5577,6 +5600,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "type": "password",
       "placeholder": "密码"
+    },
+    on: {
+      "change": _vm.setPassword
     }
   }), _c('image', {
     staticStyle: {
@@ -5594,12 +5620,15 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "text": "登陆",
       "type": "blue",
-      "btnStyle": _vm.styles.logBtn
+      "btnStyle": {
+        width: '450px',
+        height: '70px'
+      }
     },
     on: {
       "wxcButtonClicked": _vm.login
     }
-  })], 1)])])
+  })], 1)])], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 
@@ -5630,7 +5659,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\components\\new.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\src\\components\\new.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-72e079e0"
@@ -5697,7 +5726,6 @@ module.exports = {
   "count": {
     "width": "220",
     "height": "100",
-    "fontSize": "40",
     "display": "flex",
     "justifyContent": "center",
     "alignItems": "center"
@@ -5727,6 +5755,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _wxcMinibar = __webpack_require__(2);
+
+var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
+
 var _wxcButton = __webpack_require__(0);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
@@ -5735,15 +5767,11 @@ var _wxcStepper = __webpack_require__(41);
 
 var _wxcStepper2 = _interopRequireDefault(_wxcStepper);
 
-var _nav = __webpack_require__(1);
-
-var _nav2 = _interopRequireDefault(_nav);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
   name: "extend",
-  components: { Nav: _nav2.default, WxcStepper: _wxcStepper2.default, WxcButton: _wxcButton2.default },
+  components: { WxcStepper: _wxcStepper2.default, WxcButton: _wxcButton2.default, WxcMinibar: _wxcMinibar2.default },
   data: function data() {
     return {
       lights: [{
@@ -5928,6 +5956,36 @@ exports.default = {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /***/ }),
 /* 41 */
@@ -5978,7 +6036,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-stepper\\index.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-stepper\\index.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-53770b9d"
@@ -6281,7 +6339,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: ["new"]
   }, [_c('div', {
     staticClass: ["nav"]
-  }, [_c('Nav')], 1), _c('div', {
+  }, [_c('Wxc-Minibar', {
+    attrs: {
+      "title": "新建布局",
+      "backgroundColor": "#009ff0",
+      "textColor": "#FFFFFF",
+      "barStyle": {
+        height: '80px'
+      }
+    },
+    on: {
+      "wxcMinibarLeftButtonClicked": _vm.minibarLeftButtonClick
+    }
+  })], 1), _c('div', {
     staticClass: ["display"]
   }, [_c('list', {
     staticClass: ["wrapper"],
@@ -6347,7 +6417,19 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: ["add"]
   }, [_c('div', {
     staticClass: ["count"]
-  }, [_vm._m(0), _c('wxc-stepper', {
+  }, [_c('div', {
+    staticClass: ["text"]
+  }, [_vm._v("教室")]), _c('wxc-stepper', {
+    attrs: {
+      "defaultValue": 1,
+      "step": "1",
+      "min": "1"
+    }
+  })], 1), _c('div', {
+    staticClass: ["count"]
+  }, [_c('div', {
+    staticClass: ["text"]
+  }, [_vm._v("行")]), _c('wxc-stepper', {
     attrs: {
       "defaultValue": 1,
       "step": "1",
@@ -6364,24 +6446,48 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "defaultValue": 1,
       "step": "1",
-      "min": "1"
+      "min": "0"
     },
     on: {
       "wxcStepperValueChanged": _vm.setCol
+    }
+  })], 1)]), _c('div', {
+    staticClass: ["add"]
+  }, [_c('div', {
+    staticClass: ["count"]
+  }, [_c('div', {
+    staticClass: ["text"]
+  }, [_vm._v("设备")]), _c('wxc-stepper', {
+    attrs: {
+      "defaultValue": 1,
+      "step": "1",
+      "min": "1",
+      "max": "3"
+    },
+    on: {
+      "wxcStepperValueChanged": _vm.setValue
     }
   })], 1), _c('div', {
     staticClass: ["count"]
   }, [_c('div', {
     staticClass: ["text"]
-  }, [_vm._v("值")]), _c('wxc-stepper', {
+  }, [_vm._v("主机号")]), _c('wxc-stepper', {
     attrs: {
       "defaultValue": 1,
       "step": "1",
       "min": "0",
-      "max": "3"
-    },
-    on: {
-      "wxcStepperValueChanged": _vm.setValue
+      "max": "15"
+    }
+  })], 1), _c('div', {
+    staticClass: ["count"]
+  }, [_c('div', {
+    staticClass: ["text"]
+  }, [_vm._v("序列号")]), _c('wxc-stepper', {
+    attrs: {
+      "defaultValue": 1,
+      "step": "1",
+      "min": "0",
+      "max": "15"
     }
   })], 1)]), _c('div', {
     staticClass: ["btns"]
@@ -6414,11 +6520,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "wxcButtonClicked": _vm.commit
     }
   })], 1)])])])
-},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('div', {
-    staticClass: ["text"]
-  }, [_c('text', [_vm._v("行")])])
-}]}
+},staticRenderFns: []}
 module.exports.render._withStripped = true
 
 /***/ }),
@@ -6448,7 +6550,7 @@ __vue_options__ = __vue_exports__ = __vue_exports__.default
 if (typeof __vue_options__ === "function") {
   __vue_options__ = __vue_options__.options
 }
-__vue_options__.__file = "G:\\Development\\lighting-control\\src\\index.vue"
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\src\\index.vue"
 __vue_options__.render = __vue_template__.render
 __vue_options__.staticRenderFns = __vue_template__.staticRenderFns
 __vue_options__._scopeId = "data-v-1a4d8e3c"
@@ -6537,6 +6639,1295 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   return _c('div', {
     staticClass: ["content"]
   }, [_c('router-view')], 1)
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+
+/***/ }),
+/* 51 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _index = __webpack_require__(52);
+
+Object.defineProperty(exports, 'default', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_index).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __vue_exports__, __vue_options__
+var __vue_styles__ = []
+
+/* styles */
+__vue_styles__.push(__webpack_require__(53)
+)
+
+/* script */
+__vue_exports__ = __webpack_require__(54)
+
+/* template */
+var __vue_template__ = __webpack_require__(60)
+__vue_options__ = __vue_exports__ = __vue_exports__ || {}
+if (
+  typeof __vue_exports__.default === "object" ||
+  typeof __vue_exports__.default === "function"
+) {
+if (Object.keys(__vue_exports__).some(function (key) { return key !== "default" && key !== "__esModule" })) {console.error("named exports are not supported in *.vue files.")}
+__vue_options__ = __vue_exports__ = __vue_exports__.default
+}
+if (typeof __vue_options__ === "function") {
+  __vue_options__ = __vue_options__.options
+}
+__vue_options__.__file = "G:\\Development\\LightingControl\\lighting-control\\node_modules\\weex-ui\\packages\\wxc-loading\\index.vue"
+__vue_options__.render = __vue_template__.render
+__vue_options__.staticRenderFns = __vue_template__.staticRenderFns
+__vue_options__._scopeId = "data-v-12fb7c48"
+__vue_options__.style = __vue_options__.style || {}
+__vue_styles__.forEach(function (module) {
+  for (var name in module) {
+    __vue_options__.style[name] = module[name]
+  }
+})
+if (typeof __register_static_styles__ === "function") {
+  __register_static_styles__(__vue_options__._scopeId, __vue_styles__)
+}
+
+module.exports = __vue_exports__
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports) {
+
+module.exports = {
+  "loading-container": {
+    "position": "relative"
+  },
+  "loading-need-mask": {
+    "position": "absolute",
+    "top": 0,
+    "left": 0,
+    "right": 0,
+    "bottom": 0,
+    "backgroundColor": "rgba(0,0,0,0.2)"
+  },
+  "wxc-loading": {
+    "position": "fixed",
+    "left": "287",
+    "top": "500",
+    "zIndex": 9999
+  },
+  "loading-box": {
+    "alignItems": "center",
+    "justifyContent": "center",
+    "borderRadius": "20",
+    "width": "175",
+    "height": "175",
+    "backgroundColor": "rgba(0,0,0,0.8)"
+  },
+  "trip-loading": {
+    "backgroundColor": "rgba(0,0,0,0.2)"
+  },
+  "loading-trip-image": {
+    "height": "75",
+    "width": "75"
+  },
+  "loading-text": {
+    "color": "#ffffff",
+    "fontSize": "24",
+    "lineHeight": "30",
+    "height": "30",
+    "marginTop": "8",
+    "textOverflow": "ellipsis",
+    "width": "140",
+    "textAlign": "center"
+  }
+}
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _type = __webpack_require__(55);
+
+var _utils = __webpack_require__(56);
+
+var _utils2 = _interopRequireDefault(_utils);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+exports.default = {
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    },
+    loadingText: {
+      type: String,
+      default: ''
+    },
+    type: {
+      type: String,
+      default: 'default'
+    },
+    interval: {
+      type: [Number, String],
+      default: 0
+    },
+    needMask: {
+      type: Boolean,
+      default: false
+    },
+    maskStyle: {
+      type: Object,
+      default: function _default() {
+        return {};
+      }
+    }
+  },
+  data: function data() {
+    return {
+      showLoading: false,
+      tid: 0
+    };
+  },
+  watch: {
+    show: function show() {
+      this.setShow();
+    }
+  },
+  computed: {
+    loading: function loading() {
+      var loading = {};
+      switch (this.type) {
+        case 'trip':
+          loading = {
+            url: _type.GIF,
+            class: 'trip-loading'
+          };
+          break;
+        default:
+          loading = {
+            url: _type.BLACK_GIF,
+            class: 'default-loading'
+          };
+      }
+      return loading;
+    },
+    topPosition: function topPosition() {
+      return (_utils2.default.env.getPageHeight() - 200) / 2;
+    }
+  },
+  created: function created() {
+    this.setShow();
+  },
+
+  methods: {
+    maskClicked: function maskClicked() {
+      this.needMask && this.$emit('wxcLoadingMaskClicked', {});
+    },
+    setShow: function setShow() {
+      var _this = this;
+
+      var interval = this.interval,
+          show = this.show,
+          showLoading = this.showLoading;
+
+      var stInterval = parseInt(interval);
+      clearTimeout(this.tid);
+      if (show) {
+        if (showLoading) {
+          return;
+        }
+        if (stInterval === 0) {
+          this.showLoading = true;
+        } else {
+          this.tid = setTimeout(function () {
+            _this.showLoading = true;
+          }, stInterval);
+        }
+      } else {
+        this.showLoading = false;
+      }
+    }
+  }
+};
+
+/***/ }),
+/* 55 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Created by Tw93 on 2016/10/29.
+ */
+
+var GIF = exports.GIF = 'https://img.alicdn.com/tfs/TB1aks3PpXXXXcXXFXXXXXXXXXX-150-150.gif';
+var BLACK_GIF = exports.BLACK_GIF = 'https://img.alicdn.com/tfs/TB1Ep_9NVXXXXb8XVXXXXXXXXXX-74-74.gif';
+var PART = exports.PART = 'https://gtms02.alicdn.com/tfs/TB1y4QbSXXXXXbgapXXXXXXXXXX-50-50.gif';
+
+/***/ }),
+/* 56 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof2 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; /**
+                                                                                                                                                                                                                                                                                * CopyRight (C) 2017-2022 Alibaba Group Holding Limited.
+                                                                                                                                                                                                                                                                                * Created by Tw93 on 17/11/01
+                                                                                                                                                                                                                                                                                */
+
+var _urlParse = __webpack_require__(57);
+
+var _urlParse2 = _interopRequireDefault(_urlParse);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var Utils = {
+  UrlParser: _urlParse2.default,
+  _typeof: function _typeof(obj) {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+  },
+  isPlainObject: function isPlainObject(obj) {
+    return Utils._typeof(obj) === 'object';
+  },
+  isString: function isString(obj) {
+    return typeof obj === 'string';
+  },
+  isNonEmptyArray: function isNonEmptyArray() {
+    var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+
+    return obj && obj.length > 0 && Array.isArray(obj) && typeof obj !== 'undefined';
+  },
+  isObject: function isObject(item) {
+    return item && (typeof item === 'undefined' ? 'undefined' : _typeof2(item)) === 'object' && !Array.isArray(item);
+  },
+  isEmptyObject: function isEmptyObject(obj) {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+  },
+  decodeIconFont: function decodeIconFont(text) {
+    // 正则匹配 图标和文字混排 eg: 我去上学校&#xe600;,天天不&#xe600;迟到
+    var regExp = /&#x[a-z|0-9]{4,5};?/g;
+    if (regExp.test(text)) {
+      return text.replace(new RegExp(regExp, 'g'), function (iconText) {
+        var replace = iconText.replace(/&#x/, '0x').replace(/;$/, '');
+        return String.fromCharCode(replace);
+      });
+    } else {
+      return text;
+    }
+  },
+  mergeDeep: function mergeDeep(target) {
+    for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      sources[_key - 1] = arguments[_key];
+    }
+
+    if (!sources.length) return target;
+    var source = sources.shift();
+    if (Utils.isObject(target) && Utils.isObject(source)) {
+      for (var key in source) {
+        if (Utils.isObject(source[key])) {
+          if (!target[key]) {
+            Object.assign(target, _defineProperty({}, key, {}));
+          }
+          Utils.mergeDeep(target[key], source[key]);
+        } else {
+          Object.assign(target, _defineProperty({}, key, source[key]));
+        }
+      }
+    }
+    return Utils.mergeDeep.apply(Utils, [target].concat(sources));
+  },
+  appendProtocol: function appendProtocol(url) {
+    if (/^\/\//.test(url)) {
+      var bundleUrl = weex.config.bundleUrl;
+
+      return 'http' + (/^https:/.test(bundleUrl) ? 's' : '') + ':' + url;
+    }
+    return url;
+  },
+  encodeURLParams: function encodeURLParams(url) {
+    var parsedUrl = new _urlParse2.default(url, true);
+    return parsedUrl.toString();
+  },
+  goToH5Page: function goToH5Page(jumpUrl) {
+    var animated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    var callback = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+
+    var Navigator = weex.requireModule('navigator');
+    var jumpUrlObj = new Utils.UrlParser(jumpUrl, true);
+    var url = Utils.appendProtocol(jumpUrlObj.toString());
+    Navigator.push({
+      url: Utils.encodeURLParams(url),
+      animated: animated.toString()
+    }, callback);
+  },
+
+  env: {
+    isTaobao: function isTaobao() {
+      var appName = weex.config.env.appName;
+
+      return (/(tb|taobao|淘宝)/i.test(appName)
+      );
+    },
+    isTrip: function isTrip() {
+      var appName = weex.config.env.appName;
+
+      return appName === 'LX';
+    },
+    isBoat: function isBoat() {
+      var appName = weex.config.env.appName;
+
+      return appName === 'Boat' || appName === 'BoatPlayground';
+    },
+    isWeb: function isWeb() {
+      var platform = weex.config.env.platform;
+
+      return (typeof window === 'undefined' ? 'undefined' : _typeof2(window)) === 'object' && platform.toLowerCase() === 'web';
+    },
+    isIOS: function isIOS() {
+      var platform = weex.config.env.platform;
+
+      return platform.toLowerCase() === 'ios';
+    },
+
+    /**
+     * 是否为 iPhone X or iPhoneXS or iPhoneXR or iPhoneXS Max
+     * @returns {boolean}
+     */
+    isIPhoneX: function isIPhoneX() {
+      var deviceHeight = weex.config.env.deviceHeight;
+
+      if (Utils.env.isWeb()) {
+        return (typeof window === 'undefined' ? 'undefined' : _typeof2(window)) !== undefined && window.screen && window.screen.width && window.screen.height && (parseInt(window.screen.width, 10) === 375 && parseInt(window.screen.height, 10) === 812 || parseInt(window.screen.width, 10) === 414 && parseInt(window.screen.height, 10) === 896);
+      }
+      return Utils.env.isIOS() && (deviceHeight === 2436 || deviceHeight === 2688 || deviceHeight == 1792);
+    },
+    isAndroid: function isAndroid() {
+      var platform = weex.config.env.platform;
+
+      return platform.toLowerCase() === 'android';
+    },
+    isAlipay: function isAlipay() {
+      var appName = weex.config.env.appName;
+
+      return appName === 'AP';
+    },
+    isTmall: function isTmall() {
+      var appName = weex.config.env.appName;
+
+      return (/(tm|tmall|天猫)/i.test(appName)
+      );
+    },
+    isAliWeex: function isAliWeex() {
+      return Utils.env.isTmall() || Utils.env.isTrip() || Utils.env.isTaobao();
+    },
+
+    /**
+     * 获取weex屏幕真实的设置高度，需要减去导航栏高度
+     * @returns {Number}
+     */
+    getPageHeight: function getPageHeight() {
+      var env = weex.config.env;
+
+      var navHeight = Utils.env.isWeb() ? 0 : Utils.env.isIPhoneX() ? 176 : 132;
+      return env.deviceHeight / env.deviceWidth * 750 - navHeight;
+    },
+
+    /**
+     * 获取weex屏幕真实的设置高度
+     * @returns {Number}
+     */
+    getScreenHeight: function getScreenHeight() {
+      var env = weex.config.env;
+
+      return env.deviceHeight / env.deviceWidth * 750;
+    }
+  },
+
+  /**
+   * 版本号比较
+   * @memberOf Utils
+   * @param currVer {string}
+   * @param promoteVer {string}
+   * @returns {boolean}
+   * @example
+   *
+   * const { Utils } = require('@ali/wx-bridge');
+   * const { compareVersion } = Utils;
+   * console.log(compareVersion('0.1.100', '0.1.11')); // 'true'
+   */
+  compareVersion: function compareVersion() {
+    var currVer = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '0.0.0';
+    var promoteVer = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '0.0.0';
+
+    if (currVer === promoteVer) return true;
+    var currVerArr = currVer.split('.');
+    var promoteVerArr = promoteVer.split('.');
+    var len = Math.max(currVerArr.length, promoteVerArr.length);
+    for (var i = 0; i < len; i++) {
+      var proVal = ~~promoteVerArr[i];
+      var curVal = ~~currVerArr[i];
+      if (proVal < curVal) {
+        return true;
+      } else if (proVal > curVal) {
+        return false;
+      }
+    }
+    return false;
+  },
+
+  /**
+   * 分割数组
+   * @param arr 被分割数组
+   * @param size 分割数组的长度
+   * @returns {Array}
+   */
+  arrayChunk: function arrayChunk() {
+    var arr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    var size = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4;
+
+    var groups = [];
+    if (arr && arr.length > 0) {
+      groups = arr.map(function (e, i) {
+        return i % size === 0 ? arr.slice(i, i + size) : null;
+      }).filter(function (e) {
+        return e;
+      });
+    }
+    return groups;
+  },
+
+  /*
+   * 截断字符串
+   * @param str 传入字符串
+   * @param len 截断长度
+   * @param hasDot 末尾是否...
+   * @returns {String}
+   */
+  truncateString: function truncateString(str, len) {
+    var hasDot = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+    var newLength = 0;
+    var newStr = '';
+    var singleChar = '';
+    var chineseRegex = /[^\x00-\xff]/g;
+    var strLength = str.replace(chineseRegex, '**').length;
+    for (var i = 0; i < strLength; i++) {
+      singleChar = str.charAt(i).toString();
+      if (singleChar.match(chineseRegex) !== null) {
+        newLength += 2;
+      } else {
+        newLength++;
+      }
+      if (newLength > len) {
+        break;
+      }
+      newStr += singleChar;
+    }
+
+    if (hasDot && strLength > len) {
+      newStr += '...';
+    }
+    return newStr;
+  },
+
+  /*
+   * 转换 obj 为 url params参数
+   * @param obj 传入字符串
+   * @returns {String}
+   */
+  objToParams: function objToParams(obj) {
+    var str = "";
+    for (var key in obj) {
+      if (str !== "") {
+        str += "&";
+      }
+      str += key + "=" + encodeURIComponent(obj[key]);
+    }
+    return str;
+  },
+
+  /*
+   * 转换 url params参数为obj
+   * @param str 传入url参数字符串
+   * @returns {Object}
+   */
+  paramsToObj: function paramsToObj(str) {
+    var obj = {};
+    try {
+      obj = JSON.parse('{"' + decodeURI(str).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}');
+    } catch (e) {
+      console.log(e);
+    }
+    return obj;
+  },
+
+  animation: {
+    /**
+     * 返回定义页面转场动画起初的位置
+     * @param ref
+     * @param transform 运动类型
+     * @param status
+     * @param callback 回调函数
+     */
+    pageTransitionAnimation: function pageTransitionAnimation(ref, transform, status, callback) {
+      var animation = weex.requireModule('animation');
+      animation.transition(ref, {
+        styles: {
+          transform: transform
+        },
+        duration: status ? 250 : 300, // ms
+        timingFunction: status ? 'ease-in' : 'ease-out',
+        delay: 0 // ms
+      }, function () {
+        callback && callback();
+      });
+    }
+  },
+  uiStyle: {
+    /**
+     * 返回定义页面转场动画起初的位置
+     * @param animationType 页面转场动画的类型 push，model
+     * @param size 分割数组的长度
+     * @returns {}
+     */
+    pageTransitionAnimationStyle: function pageTransitionAnimationStyle(animationType) {
+      if (animationType === 'push') {
+        return {
+          left: '750px',
+          top: '0px',
+          height: weex.config.env.deviceHeight / weex.config.env.deviceWidth * 750 + 'px'
+        };
+      } else if (animationType === 'model') {
+        return {
+          top: weex.config.env.deviceHeight / weex.config.env.deviceWidth * 750 + 'px',
+          left: '0px',
+          height: weex.config.env.deviceHeight / weex.config.env.deviceWidth * 750 + 'px'
+        };
+      }
+      return {};
+    }
+  }
+};
+
+exports.default = Utils;
+
+/***/ }),
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var required = __webpack_require__(58)
+  , qs = __webpack_require__(59)
+  , protocolre = /^([a-z][a-z0-9.+-]*:)?(\/\/)?([\S\s]*)/i
+  , slashes = /^[A-Za-z][A-Za-z0-9+-.]*:\/\//;
+
+/**
+ * These are the parse rules for the URL parser, it informs the parser
+ * about:
+ *
+ * 0. The char it Needs to parse, if it's a string it should be done using
+ *    indexOf, RegExp using exec and NaN means set as current value.
+ * 1. The property we should set when parsing this value.
+ * 2. Indication if it's backwards or forward parsing, when set as number it's
+ *    the value of extra chars that should be split off.
+ * 3. Inherit from location if non existing in the parser.
+ * 4. `toLowerCase` the resulting value.
+ */
+var rules = [
+  ['#', 'hash'],                        // Extract from the back.
+  ['?', 'query'],                       // Extract from the back.
+  function sanitize(address) {          // Sanitize what is left of the address
+    return address.replace('\\', '/');
+  },
+  ['/', 'pathname'],                    // Extract from the back.
+  ['@', 'auth', 1],                     // Extract from the front.
+  [NaN, 'host', undefined, 1, 1],       // Set left over value.
+  [/:(\d+)$/, 'port', undefined, 1],    // RegExp the back.
+  [NaN, 'hostname', undefined, 1, 1]    // Set left over.
+];
+
+/**
+ * These properties should not be copied or inherited from. This is only needed
+ * for all non blob URL's as a blob URL does not include a hash, only the
+ * origin.
+ *
+ * @type {Object}
+ * @private
+ */
+var ignore = { hash: 1, query: 1 };
+
+/**
+ * The location object differs when your code is loaded through a normal page,
+ * Worker or through a worker using a blob. And with the blobble begins the
+ * trouble as the location object will contain the URL of the blob, not the
+ * location of the page where our code is loaded in. The actual origin is
+ * encoded in the `pathname` so we can thankfully generate a good "default"
+ * location from it so we can generate proper relative URL's again.
+ *
+ * @param {Object|String} loc Optional default location object.
+ * @returns {Object} lolcation object.
+ * @public
+ */
+function lolcation(loc) {
+  var globalVar;
+
+  if (typeof window !== 'undefined') globalVar = window;
+  else if (typeof global !== 'undefined') globalVar = global;
+  else if (typeof self !== 'undefined') globalVar = self;
+  else globalVar = {};
+
+  var location = globalVar.location || {};
+  loc = loc || location;
+
+  var finaldestination = {}
+    , type = typeof loc
+    , key;
+
+  if ('blob:' === loc.protocol) {
+    finaldestination = new Url(unescape(loc.pathname), {});
+  } else if ('string' === type) {
+    finaldestination = new Url(loc, {});
+    for (key in ignore) delete finaldestination[key];
+  } else if ('object' === type) {
+    for (key in loc) {
+      if (key in ignore) continue;
+      finaldestination[key] = loc[key];
+    }
+
+    if (finaldestination.slashes === undefined) {
+      finaldestination.slashes = slashes.test(loc.href);
+    }
+  }
+
+  return finaldestination;
+}
+
+/**
+ * @typedef ProtocolExtract
+ * @type Object
+ * @property {String} protocol Protocol matched in the URL, in lowercase.
+ * @property {Boolean} slashes `true` if protocol is followed by "//", else `false`.
+ * @property {String} rest Rest of the URL that is not part of the protocol.
+ */
+
+/**
+ * Extract protocol information from a URL with/without double slash ("//").
+ *
+ * @param {String} address URL we want to extract from.
+ * @return {ProtocolExtract} Extracted information.
+ * @private
+ */
+function extractProtocol(address) {
+  var match = protocolre.exec(address);
+
+  return {
+    protocol: match[1] ? match[1].toLowerCase() : '',
+    slashes: !!match[2],
+    rest: match[3]
+  };
+}
+
+/**
+ * Resolve a relative URL pathname against a base URL pathname.
+ *
+ * @param {String} relative Pathname of the relative URL.
+ * @param {String} base Pathname of the base URL.
+ * @return {String} Resolved pathname.
+ * @private
+ */
+function resolve(relative, base) {
+  var path = (base || '/').split('/').slice(0, -1).concat(relative.split('/'))
+    , i = path.length
+    , last = path[i - 1]
+    , unshift = false
+    , up = 0;
+
+  while (i--) {
+    if (path[i] === '.') {
+      path.splice(i, 1);
+    } else if (path[i] === '..') {
+      path.splice(i, 1);
+      up++;
+    } else if (up) {
+      if (i === 0) unshift = true;
+      path.splice(i, 1);
+      up--;
+    }
+  }
+
+  if (unshift) path.unshift('');
+  if (last === '.' || last === '..') path.push('');
+
+  return path.join('/');
+}
+
+/**
+ * The actual URL instance. Instead of returning an object we've opted-in to
+ * create an actual constructor as it's much more memory efficient and
+ * faster and it pleases my OCD.
+ *
+ * It is worth noting that we should not use `URL` as class name to prevent
+ * clashes with the global URL instance that got introduced in browsers.
+ *
+ * @constructor
+ * @param {String} address URL we want to parse.
+ * @param {Object|String} [location] Location defaults for relative paths.
+ * @param {Boolean|Function} [parser] Parser for the query string.
+ * @private
+ */
+function Url(address, location, parser) {
+  if (!(this instanceof Url)) {
+    return new Url(address, location, parser);
+  }
+
+  var relative, extracted, parse, instruction, index, key
+    , instructions = rules.slice()
+    , type = typeof location
+    , url = this
+    , i = 0;
+
+  //
+  // The following if statements allows this module two have compatibility with
+  // 2 different API:
+  //
+  // 1. Node.js's `url.parse` api which accepts a URL, boolean as arguments
+  //    where the boolean indicates that the query string should also be parsed.
+  //
+  // 2. The `URL` interface of the browser which accepts a URL, object as
+  //    arguments. The supplied object will be used as default values / fall-back
+  //    for relative paths.
+  //
+  if ('object' !== type && 'string' !== type) {
+    parser = location;
+    location = null;
+  }
+
+  if (parser && 'function' !== typeof parser) parser = qs.parse;
+
+  location = lolcation(location);
+
+  //
+  // Extract protocol information before running the instructions.
+  //
+  extracted = extractProtocol(address || '');
+  relative = !extracted.protocol && !extracted.slashes;
+  url.slashes = extracted.slashes || relative && location.slashes;
+  url.protocol = extracted.protocol || location.protocol || '';
+  address = extracted.rest;
+
+  //
+  // When the authority component is absent the URL starts with a path
+  // component.
+  //
+  if (!extracted.slashes) instructions[3] = [/(.*)/, 'pathname'];
+
+  for (; i < instructions.length; i++) {
+    instruction = instructions[i];
+
+    if (typeof instruction === 'function') {
+      address = instruction(address);
+      continue;
+    }
+
+    parse = instruction[0];
+    key = instruction[1];
+
+    if (parse !== parse) {
+      url[key] = address;
+    } else if ('string' === typeof parse) {
+      if (~(index = address.indexOf(parse))) {
+        if ('number' === typeof instruction[2]) {
+          url[key] = address.slice(0, index);
+          address = address.slice(index + instruction[2]);
+        } else {
+          url[key] = address.slice(index);
+          address = address.slice(0, index);
+        }
+      }
+    } else if ((index = parse.exec(address))) {
+      url[key] = index[1];
+      address = address.slice(0, index.index);
+    }
+
+    url[key] = url[key] || (
+      relative && instruction[3] ? location[key] || '' : ''
+    );
+
+    //
+    // Hostname, host and protocol should be lowercased so they can be used to
+    // create a proper `origin`.
+    //
+    if (instruction[4]) url[key] = url[key].toLowerCase();
+  }
+
+  //
+  // Also parse the supplied query string in to an object. If we're supplied
+  // with a custom parser as function use that instead of the default build-in
+  // parser.
+  //
+  if (parser) url.query = parser(url.query);
+
+  //
+  // If the URL is relative, resolve the pathname against the base URL.
+  //
+  if (
+      relative
+    && location.slashes
+    && url.pathname.charAt(0) !== '/'
+    && (url.pathname !== '' || location.pathname !== '')
+  ) {
+    url.pathname = resolve(url.pathname, location.pathname);
+  }
+
+  //
+  // We should not add port numbers if they are already the default port number
+  // for a given protocol. As the host also contains the port number we're going
+  // override it with the hostname which contains no port number.
+  //
+  if (!required(url.port, url.protocol)) {
+    url.host = url.hostname;
+    url.port = '';
+  }
+
+  //
+  // Parse down the `auth` for the username and password.
+  //
+  url.username = url.password = '';
+  if (url.auth) {
+    instruction = url.auth.split(':');
+    url.username = instruction[0] || '';
+    url.password = instruction[1] || '';
+  }
+
+  url.origin = url.protocol && url.host && url.protocol !== 'file:'
+    ? url.protocol +'//'+ url.host
+    : 'null';
+
+  //
+  // The href is just the compiled result.
+  //
+  url.href = url.toString();
+}
+
+/**
+ * This is convenience method for changing properties in the URL instance to
+ * insure that they all propagate correctly.
+ *
+ * @param {String} part          Property we need to adjust.
+ * @param {Mixed} value          The newly assigned value.
+ * @param {Boolean|Function} fn  When setting the query, it will be the function
+ *                               used to parse the query.
+ *                               When setting the protocol, double slash will be
+ *                               removed from the final url if it is true.
+ * @returns {URL} URL instance for chaining.
+ * @public
+ */
+function set(part, value, fn) {
+  var url = this;
+
+  switch (part) {
+    case 'query':
+      if ('string' === typeof value && value.length) {
+        value = (fn || qs.parse)(value);
+      }
+
+      url[part] = value;
+      break;
+
+    case 'port':
+      url[part] = value;
+
+      if (!required(value, url.protocol)) {
+        url.host = url.hostname;
+        url[part] = '';
+      } else if (value) {
+        url.host = url.hostname +':'+ value;
+      }
+
+      break;
+
+    case 'hostname':
+      url[part] = value;
+
+      if (url.port) value += ':'+ url.port;
+      url.host = value;
+      break;
+
+    case 'host':
+      url[part] = value;
+
+      if (/:\d+$/.test(value)) {
+        value = value.split(':');
+        url.port = value.pop();
+        url.hostname = value.join(':');
+      } else {
+        url.hostname = value;
+        url.port = '';
+      }
+
+      break;
+
+    case 'protocol':
+      url.protocol = value.toLowerCase();
+      url.slashes = !fn;
+      break;
+
+    case 'pathname':
+    case 'hash':
+      if (value) {
+        var char = part === 'pathname' ? '/' : '#';
+        url[part] = value.charAt(0) !== char ? char + value : value;
+      } else {
+        url[part] = value;
+      }
+      break;
+
+    default:
+      url[part] = value;
+  }
+
+  for (var i = 0; i < rules.length; i++) {
+    var ins = rules[i];
+
+    if (ins[4]) url[ins[1]] = url[ins[1]].toLowerCase();
+  }
+
+  url.origin = url.protocol && url.host && url.protocol !== 'file:'
+    ? url.protocol +'//'+ url.host
+    : 'null';
+
+  url.href = url.toString();
+
+  return url;
+}
+
+/**
+ * Transform the properties back in to a valid and full URL string.
+ *
+ * @param {Function} stringify Optional query stringify function.
+ * @returns {String} Compiled version of the URL.
+ * @public
+ */
+function toString(stringify) {
+  if (!stringify || 'function' !== typeof stringify) stringify = qs.stringify;
+
+  var query
+    , url = this
+    , protocol = url.protocol;
+
+  if (protocol && protocol.charAt(protocol.length - 1) !== ':') protocol += ':';
+
+  var result = protocol + (url.slashes ? '//' : '');
+
+  if (url.username) {
+    result += url.username;
+    if (url.password) result += ':'+ url.password;
+    result += '@';
+  }
+
+  result += url.host + url.pathname;
+
+  query = 'object' === typeof url.query ? stringify(url.query) : url.query;
+  if (query) result += '?' !== query.charAt(0) ? '?'+ query : query;
+
+  if (url.hash) result += url.hash;
+
+  return result;
+}
+
+Url.prototype = { set: set, toString: toString };
+
+//
+// Expose the URL parser and some additional properties that might be useful for
+// others or testing.
+//
+Url.extractProtocol = extractProtocol;
+Url.location = lolcation;
+Url.qs = qs;
+
+module.exports = Url;
+
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * Check if we're required to add a port number.
+ *
+ * @see https://url.spec.whatwg.org/#default-port
+ * @param {Number|String} port Port number we need to check
+ * @param {String} protocol Protocol we need to check against.
+ * @returns {Boolean} Is it a default port for the given protocol
+ * @api private
+ */
+module.exports = function required(port, protocol) {
+  protocol = protocol.split(':')[0];
+  port = +port;
+
+  if (!port) return false;
+
+  switch (protocol) {
+    case 'http':
+    case 'ws':
+    return port !== 80;
+
+    case 'https':
+    case 'wss':
+    return port !== 443;
+
+    case 'ftp':
+    return port !== 21;
+
+    case 'gopher':
+    return port !== 70;
+
+    case 'file':
+    return false;
+  }
+
+  return port !== 0;
+};
+
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , undef;
+
+/**
+ * Decode a URI encoded string.
+ *
+ * @param {String} input The URI encoded string.
+ * @returns {String} The decoded string.
+ * @api private
+ */
+function decode(input) {
+  return decodeURIComponent(input.replace(/\+/g, ' '));
+}
+
+/**
+ * Simple query string parser.
+ *
+ * @param {String} query The query string that needs to be parsed.
+ * @returns {Object}
+ * @api public
+ */
+function querystring(query) {
+  var parser = /([^=?&]+)=?([^&]*)/g
+    , result = {}
+    , part;
+
+  while (part = parser.exec(query)) {
+    var key = decode(part[1])
+      , value = decode(part[2]);
+
+    //
+    // Prevent overriding of existing properties. This ensures that build-in
+    // methods like `toString` or __proto__ are not overriden by malicious
+    // querystrings.
+    //
+    if (key in result) continue;
+    result[key] = value;
+  }
+
+  return result;
+}
+
+/**
+ * Transform a query string to an object.
+ *
+ * @param {Object} obj Object that should be transformed.
+ * @param {String} prefix Optional prefix.
+ * @returns {String}
+ * @api public
+ */
+function querystringify(obj, prefix) {
+  prefix = prefix || '';
+
+  var pairs = []
+    , value
+    , key;
+
+  //
+  // Optionally prefix with a '?' if needed
+  //
+  if ('string' !== typeof prefix) prefix = '?';
+
+  for (key in obj) {
+    if (has.call(obj, key)) {
+      value = obj[key];
+
+      //
+      // Edge cases where we actually want to encode the value to an empty
+      // string instead of the stringified value.
+      //
+      if (!value && (value === null || value === undef || isNaN(value))) {
+        value = '';
+      }
+
+      pairs.push(encodeURIComponent(key) +'='+ encodeURIComponent(value));
+    }
+  }
+
+  return pairs.length ? prefix + pairs.join('&') : '';
+}
+
+//
+// Expose the module.
+//
+exports.stringify = querystringify;
+exports.parse = querystring;
+
+
+/***/ }),
+/* 60 */
+/***/ (function(module, exports) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    class: ['loading-container', _vm.showLoading && _vm.needMask && 'loading-need-mask'],
+    style: _vm.maskStyle,
+    on: {
+      "click": _vm.maskClicked
+    }
+  }, [(_vm.showLoading) ? _c('div', {
+    staticClass: ["wxc-loading"],
+    style: {
+      top: _vm.topPosition + 'px'
+    }
+  }, [_c('div', {
+    class: ['loading-box', _vm.loading.class],
+    attrs: {
+      "ariaHidden": true
+    }
+  }, [_c('image', {
+    staticClass: ["loading-trip-image"],
+    attrs: {
+      "src": _vm.loading.url,
+      "resize": "contain",
+      "quality": "original"
+    }
+  }), (_vm.loadingText) ? _c('text', {
+    staticClass: ["loading-text"]
+  }, [_vm._v(_vm._s(_vm.loadingText))]) : _vm._e()])]) : _vm._e()])
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 

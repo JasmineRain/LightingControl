@@ -1,7 +1,12 @@
 <template>
   <div class="new">
     <div class="nav">
-      <Nav></Nav>
+      <Wxc-Minibar title="新建布局"
+                   background-color="#009ff0"
+                   text-color="#FFFFFF"
+                   @wxcMinibarLeftButtonClicked="minibarLeftButtonClick"
+                   :bar-style="{height: '80px'}">
+      </Wxc-Minibar>
     </div>
     <div class="display">
       <list class="wrapper" show-scrollbar="false">
@@ -20,7 +25,14 @@
       </list>
       <div class="add">
         <div class="count">
-          <div class="text"><text>行</text></div>
+          <div class="text">教室</div>
+          <wxc-stepper :default-value="1"
+                       step="1"
+                       min="1">
+          </wxc-stepper>
+        </div>
+        <div class="count">
+          <div class="text">行</div>
           <wxc-stepper :default-value="1"
                        step="1"
                        min="1"
@@ -31,17 +43,35 @@
           <div class="text">列</div>
           <wxc-stepper :default-value="1"
                        step="1"
-                       min="1"
+                       min="0"
                        @wxcStepperValueChanged="setCol">
           </wxc-stepper>
         </div>
+      </div>
+      <div class="add">
         <div class="count">
-          <div class="text">值</div>
+          <div class="text">设备</div>
+          <wxc-stepper :default-value="1"
+                       step="1"
+                       min="1"
+                       max="3"
+                       @wxcStepperValueChanged="setValue">
+          </wxc-stepper>
+        </div>
+        <div class="count">
+          <div class="text">主机号</div>
           <wxc-stepper :default-value="1"
                        step="1"
                        min="0"
-                       max="3"
-                       @wxcStepperValueChanged="setValue">
+                       max="15">
+          </wxc-stepper>
+        </div>
+        <div class="count">
+          <div class="text">序列号</div>
+          <wxc-stepper :default-value="1"
+                       step="1"
+                       min="0"
+                       max="15">
           </wxc-stepper>
         </div>
       </div>
@@ -58,11 +88,10 @@
 </template>
 
 <script>
-  import Nav from './nav'
-  import { WxcStepper, WxcButton } from 'weex-ui';
+  import { WxcStepper, WxcButton, WxcMinibar } from 'weex-ui';
   export default {
     name: "extend",
-    components: {Nav, WxcStepper, WxcButton},
+    components: { WxcStepper, WxcButton, WxcMinibar},
     data() {
       return {
         lights: [
@@ -219,7 +248,6 @@
   .count {
     width: 220px;
     height: 100px;
-    font-size: 40px;
     display: flex;
     justify-content: center;
     align-items: center;

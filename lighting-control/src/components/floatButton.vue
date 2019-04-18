@@ -23,22 +23,30 @@
 <script>
   import {WxcIcon} from 'weex-ui'
   const modal = weex.requireModule('modal');
-  const toast = message => {
-    modal.toast({
-      message,
-      duration: 1,
-    });
-  };
+  const storage = weex.requireModule('storage');
+
   export default {
     components: {WxcIcon},
     name: "menu",
     methods: {
       handleClick() {
-        toast('float button clicked');
-        this.$router.push('/new')
+        storage.getItem('token', event => {
+          let role = JSON.parse(atob(event.data.split('.')[1])).role;
+          if(role >=50 ) {
+            this.$router.push('/new');
+          }
+          else{
+            modal.toast({
+              message: '权限不足',
+              duration: 1
+            });
+          }
+        });
+
       }
     }
   }
+
 </script>
 
 <style scoped>

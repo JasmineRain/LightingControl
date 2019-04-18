@@ -1,7 +1,13 @@
 <template>
   <div class="lighting">
+    <Wxc-loading :show="loading" :need-mask="true" type="trip"></Wxc-loading>
     <div class="nav">
-      <Nav></Nav>
+      <Wxc-Minibar title="教室1"
+                   background-color="#009ff0"
+                   text-color="#FFFFFF"
+                   leftButton=""
+                   :bar-style="{height: '80px'}">
+      </Wxc-Minibar>
     </div>
     <div class="bulb">
       <div class="index_bar">
@@ -44,9 +50,11 @@
 </template>
 
 <script>
-  import floatButton from './floatButton'
-  import Nav from './nav'
-  const dom = weex.requireModule('dom')
+  import floatButton from './floatButton';
+  import { WxcMinibar, WxcLoading } from 'weex-ui';
+  const modal = weex.requireModule('modal');
+  const stream = weex.requireModule('stream');
+  const storage = weex.requireModule('storage');
   export default {
     name: "lightings",
     data() {
@@ -101,10 +109,14 @@
           }, {
             row: 6, col: 4, value: 3
           }
-        ]  //模拟灯光数据
+        ],  //模拟灯光数据
+        loading: true,
+        address: 'http://127.0.0.1',
+        port: 3000,
+        token: ''
       }
     },
-    components: {floatButton, Nav},
+    components: {floatButton, WxcMinibar, WxcLoading},
     methods: {
       calc: function (data) {
         let rmax = 0;
@@ -119,6 +131,56 @@
         });
         return {row: rmax, col: cmax};
       },
+
+      minibarLeftButtonClick: function () {
+        console.log("click back at home page");
+      },
+
+      getLightsInfo: function () {
+        this.loading = true;
+        storage.getItem('token', event => {
+          console.log('get value:', event.data);
+          this.token = event.data;
+        });
+        stream.fetch({
+          method: 'GET',
+          url: this.address + ':' + this.port + '/lights/info',
+          type: 'json',
+          headers: {'Authorization': "Bearer " + this.token}
+        }, (res) => {
+          this.loading = false;
+          if(!res.ok){
+            modal.toast({
+              message: '请检查网络连接',
+              duration: 2
+            });
+          }
+          else{
+            console.log(res.data);
+            if(res.data.status === 200) {
+              modal.toast({
+                message: '获取灯光信息',
+                duration: 2
+              });
+              //更新灯光信息
+            }
+            else if(res.data.status === 401) {
+              modal.toast({
+                message: '登陆超时,请重新登陆',
+                duration: 1
+              });
+              this.$router.push('/login');
+            }
+            else{
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
+          }
+        });
+      }
+
       // handleTableRowScroll: function (e) {
       //   let c = this.$refs.col1;
       //   dom.scrollToElement(c, {offset: e.contentOffset.x - 20});
@@ -186,6 +248,9 @@
             return "local://img_control.png"
         }
       }
+    },
+    mounted() {
+      this.getLightsInfo();
     }
   }
 </script>
@@ -274,14 +339,5 @@
     justify-content: space-between;
     align-items: flex-start;
     flex-direction: row;
-  }
-  @font-face {
-    font-family: 'iconfont';  /* project id 1082858 */
-    src: url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.eot');
-    src: url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.eot?#iefix') format('embedded-opentype'),
-    url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.woff2') format('woff2'),
-    url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.woff') format('woff'),
-    url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.ttf') format('truetype'),
-    url('//at.alicdn.com/t/font_1082858_bwun2jwz4wr.svg#iconfont') format('svg');
   }
 </style>
