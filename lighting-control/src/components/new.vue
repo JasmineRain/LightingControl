@@ -1,5 +1,6 @@
 <template>
   <div class="new">
+    <Wxc-loading :show="sending" :need-mask="true" type="trip"></Wxc-loading>
     <div class="nav">
       <Wxc-Minibar title="新建布局"
                    background-color="#009ff0"
@@ -28,7 +29,8 @@
           <div class="text">教室</div>
           <wxc-stepper :default-value="1"
                        step="1"
-                       min="1">
+                       min="1"
+                       @wxcStepperValueChanged="setRoom">
           </wxc-stepper>
         </div>
         <div class="count">
@@ -43,7 +45,7 @@
           <div class="text">列</div>
           <wxc-stepper :default-value="1"
                        step="1"
-                       min="0"
+                       min="1"
                        @wxcStepperValueChanged="setCol">
           </wxc-stepper>
         </div>
@@ -63,7 +65,8 @@
           <wxc-stepper :default-value="1"
                        step="1"
                        min="0"
-                       max="15">
+                       max="15"
+                       @wxcStepperValueChanged="setHost">
           </wxc-stepper>
         </div>
         <div class="count">
@@ -71,7 +74,8 @@
           <wxc-stepper :default-value="1"
                        step="1"
                        min="0"
-                       max="15">
+                       max="15"
+                       @wxcStepperValueChanged="setSeq">
           </wxc-stepper>
         </div>
       </div>
@@ -88,32 +92,41 @@
 </template>
 
 <script>
-  import { WxcStepper, WxcButton, WxcMinibar } from 'weex-ui';
+  import { WxcStepper, WxcButton, WxcMinibar, WxcLoading } from 'weex-ui';
+  const stream = weex.requireModule('stream');
+  const storage = weex.requireModule('storage');
+  const modal = weex.requireModule('modal');
   export default {
     name: "extend",
-    components: { WxcStepper, WxcButton, WxcMinibar},
+    components: { WxcStepper, WxcButton, WxcMinibar, WxcLoading},
     data() {
       return {
-        lights: [
+        room: 0,
+        display: [
           {
-            row: 1, col: 1, value: 2
+            row: 1, col: 1, value: 2, host: 0, sequence: 0
           }
         ],  //模拟灯光数据
         light: {
           row: 1,
           col: 1,
-          value: 0  //0-空，1-灯灭， 2-灯亮， 3-开关
-        }
+          value: 0,  //0-空，1-灯灭， 2-灯亮， 3-开关
+          host: 0,
+          sequence: 0
+        },
+        sending: false,
+        address: 'http://127.0.0.1',
+        port: 3000,
+        token: ''
       }
     },
     methods: {
+
+      //动态计算矩阵大小
       calc: function (data) {
         let rmax = 0;
         let cmax = 0;
         data.forEach(function (item) {
-          // if (item.value === 1 || item.value === 2 || item.value === 3) {
-          //
-          // }
           if (item.row > rmax)
             rmax = item.row;
           if (item.col > cmax)
@@ -121,31 +134,89 @@
         });
         return {row: rmax, col: cmax};
       },
+
+      //绑定输入
       setRow: function (e) {
         this.light.row = e.value;
       },
       setCol: function (e) {
         this.light.col = e.value;
       },
+
+      //1-无   2-灯   3-开关
       setValue: function (e) {
         this.light.value = e.value;
       },
+
+      setRoom: function(e) {
+        this.room = e.value;
+      },
+      setHost: function(e) {
+        this.light.host = e.value;
+      },
+      setSeq: function(e) {
+        this.light.sequence = e.value;
+      },
+
+      //实时查看输入
       add: function () {
-        for (let item of this.lights) {
+        for (let item of this.display) {
           if(item.row === this.light.row && item.col === this.light.col){
             item.value = this.light.value;
             return
           }
         }
-        this.lights.push({row: this.light.row, col: this.light.col, value: this.light.value})
+        this.display.push({
+          row: this.light.row,
+          col: this.light.col,
+          value: this.light.value,
+          host: this.light.host,
+          sequence: this.light.sequence
+        })
       },
+
+      minibarLeftButtonClick: function () {
+
+      },
+
+      //提交到服务器
       commit: function () {
-        console.log("commit to server");
+        if(this.sending)
+          return;
+        storage.getItem('token', event => {
+          console.log('get value:', event.data);
+          this.token = event.data;
+        });
+        this.sending = true;
+        const body = JSON.stringify({room: this.room, display: this.display});
+        stream.fetch({
+          method: 'POST',
+          url: this.address + ':' + this.port + '/lights/new',
+          type: 'json',
+          body: body,
+          headers: {'Content-Type': 'application/json', 'Authorization': "Bearer " + this.token}
+        }, (res) => {
+          this.sending = false;
+          if(!res.ok){
+            modal.toast({
+              message: '请检查网络连接',
+              duration: 2
+            });
+          }
+          else{
+            modal.toast({
+              message: res.data.message,
+              duration: 2
+            });
+          }
+        });
       }
     },
     computed: {
+
+      //灯光数据调整  因UI显示不同
       rect: function () {
-        let size = this.calc(this.lights);
+        let size = this.calc(this.display);
         let bulbs = new Array(size.col);
         for(let i =0; i<size.col; i++) {
           bulbs[i] = new Array(size.row);
@@ -160,13 +231,15 @@
         //1,3 - 3,5 - 3,1
         //1,6 - 6,5 - 6,1
         //2,1 - 1,4 - 1,2
-        if(this.lights.length !== 0){
-          this.lights.forEach(function (light) {
+        if(this.display.length !== 0){
+          this.display.forEach(function (light) {
             bulbs[light.col-1][light.row-1] = light.value;
           });
         }
         return bulbs;
       },
+
+      //灯光开路径
       onSrc: function () {
         switch (WXEnvironment.platform) {
           case 'Web':
@@ -177,6 +250,8 @@
             return "local://img_bulb_on.png"
         }
       },
+
+      //灯光关路径
       offSrc: function () {
         switch (WXEnvironment.platform) {
           case 'Web':
@@ -187,6 +262,8 @@
             return "local://img_bulb_off.png"
         }
       },
+
+      //开关路径
       switcherSrc: function () {
         switch (WXEnvironment.platform) {
           case 'Web':

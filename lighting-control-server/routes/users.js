@@ -30,11 +30,11 @@ router.post('/register', (req, res, next) => {
       })
     }
     else {
-      let user = new userModel({
+      let newUser = new userModel({
         username: u.username,
         password: u.password
       });
-      user.save(function (err, user) {
+      newUser.save(function (err, user) {
         if(err) {
           console.log(err);
           res.send({

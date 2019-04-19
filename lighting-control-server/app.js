@@ -4,12 +4,18 @@ const cors = require('cors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const mongoose = require('mongoose');
+
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const lightRouter = require('./routes/lights');
 
 const app = express();
+
+const dbUrl = 'mongodb://localhost/lighting';
+
+mongoose.connect(dbUrl, { useNewUrlParser: true });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

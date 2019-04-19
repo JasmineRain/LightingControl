@@ -1,9 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const SALT_WORK_FACTOR = 10;
-const dbUrl = 'mongodb://localhost/lighting';
-
-mongoose.connect(dbUrl, { useNewUrlParser: true });
 
 let userSchema = mongoose.Schema({
   username: {

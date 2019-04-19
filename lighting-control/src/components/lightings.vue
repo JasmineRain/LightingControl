@@ -34,8 +34,8 @@
                   <div class="col" v-for="(col, cindex) in row">
                     <!--<text>aaa</text>-->
                     <image v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
-                    <image v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
-                    <image v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
+                    <image @click="clickBulb({row: cindex, col: rindex, value: col})" v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
+                    <image @click="clickBulb({row: cindex, col: rindex, value: col})" v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
                     <image v-if="col === 3" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
                   </div>
                 </div>
@@ -110,7 +110,7 @@
             row: 6, col: 4, value: 3
           }
         ],  //模拟灯光数据
-        loading: true,
+        loading: false,
         address: 'http://127.0.0.1',
         port: 3000,
         token: ''
@@ -139,7 +139,6 @@
       getLightsInfo: function () {
         this.loading = true;
         storage.getItem('token', event => {
-          console.log('get value:', event.data);
           this.token = event.data;
         });
         stream.fetch({
@@ -179,6 +178,10 @@
             }
           }
         });
+      },
+
+      clickBulb: function (info) {
+        console.log(info);
       }
 
       // handleTableRowScroll: function (e) {
