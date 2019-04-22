@@ -76,7 +76,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(20);
+var _index = __webpack_require__(11);
 
 Object.defineProperty(exports, 'default', {
   enumerable: true,
@@ -98,7 +98,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(38);
+var _index = __webpack_require__(20);
 
 Object.defineProperty(exports, 'default', {
   enumerable: true,
@@ -120,7 +120,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(11);
+var _index = __webpack_require__(38);
 
 Object.defineProperty(exports, 'default', {
   enumerable: true,
@@ -4044,11 +4044,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcLoading = __webpack_require__(2);
+var _wxcLoading = __webpack_require__(0);
 
 var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
 
-var _wxcMinibar = __webpack_require__(0);
+var _wxcMinibar = __webpack_require__(1);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
@@ -6464,11 +6464,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcLoading = __webpack_require__(2);
+var _wxcLoading = __webpack_require__(0);
 
 var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
 
-var _wxcButton = __webpack_require__(1);
+var _wxcButton = __webpack_require__(2);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 
@@ -7061,15 +7061,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcLoading = __webpack_require__(2);
+var _wxcLoading = __webpack_require__(0);
 
 var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
 
-var _wxcMinibar = __webpack_require__(0);
+var _wxcMinibar = __webpack_require__(1);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
-var _wxcButton = __webpack_require__(1);
+var _wxcButton = __webpack_require__(2);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 
@@ -7993,11 +7993,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcMinibar = __webpack_require__(0);
+var _wxcMinibar = __webpack_require__(1);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
-var _wxcButton = __webpack_require__(1);
+var _wxcButton = __webpack_require__(2);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 

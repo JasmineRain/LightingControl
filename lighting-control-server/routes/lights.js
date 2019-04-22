@@ -14,9 +14,27 @@ router.use(auth.jwtCheck, auth.noAuthenticateCheck, auth.redisCheck);
 
 
 router.get('/info', (req, res, next) => {
-  res.send({
-    status: 200,
-    message: "返回灯光数据"
+
+  global.socket.write('get lights');
+
+  global.socket.once('data', function(data) {
+    res.send({
+      status: 200,
+      message: data.toString()
+    })
+  });
+
+
+});
+
+router.post('/operation', (req, res, next) => {
+  global.socket.write('set lights');
+
+  global.socket.once('data', function (data) {
+    res.send({
+      status: 200,
+      message: data.toString()
+    })
   })
 });
 
