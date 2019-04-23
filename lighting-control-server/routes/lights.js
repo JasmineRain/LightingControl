@@ -15,25 +15,55 @@ router.use(auth.jwtCheck, auth.noAuthenticateCheck, auth.redisCheck);
 
 router.get('/info', (req, res, next) => {
 
-  global.socket.write('get lights');
+  global.socket.write(`{'type': 'GET'}`);
+
+  let classroom = 1;
 
   global.socket.once('data', function(data) {
-    res.send({
-      status: 200,
-      message: data.toString()
-    })
+    //处理主机号序列号与行列号关系并返回
+    classroom = JSON.parse(data).classroom || 1;
+    displayModel.findOne({classroom: classroom}, function (err, display) {
+      let info = [];
+      if(err) {
+        console.log(err);
+        return res.send({
+          status: 500,
+          message: "服务器查询错误3"
+        });
+      }
+
+      if(display) {
+        let d =display.display;
+        let lights = JSON.parse(data).lights;
+        lights.forEach(function (item) {
+          let e = d.find(function (element) {
+            return element.host === item.host && element.sequence === item.sequence;
+          });
+          info.push({
+            row: e.row, col: e.col, value: item.sw === 'ON' ?  2 : 1, host: item.host, sequence: item.sequence
+          })
+        });
+      }
+      res.send({
+        status: 200,
+        lights: info,
+        message: '获取灯光信息成功'
+      })
+    });
   });
-
-
 });
 
 router.post('/operation', (req, res, next) => {
-  global.socket.write('set lights');
+
+  global.socket.write(`{
+    'type': 'SET_TURN_${req.body.type}', 'light': [{'host': '${req.body.host}', 'sequence': '${req.body.sequence}'}]
+  }`);
 
   global.socket.once('data', function (data) {
+    console.log(data.toString());
     res.send({
       status: 200,
-      message: data.toString()
+      message: '设置灯光成功'
     })
   })
 });
@@ -46,7 +76,7 @@ router.post('/new', (req, res, next) => {
       console.log(err);
       return res.send({
         status: 500,
-        message: "服务器查询错误3"
+        message: "服务器查询错误4"
       });
     }
 

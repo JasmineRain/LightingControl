@@ -200,14 +200,33 @@
           if(!res.ok){
             modal.toast({
               message: '请检查网络连接',
-              duration: 2
+              duration: 1
             });
           }
           else{
-            modal.toast({
-              message: res.data.message,
-              duration: 2
-            });
+            //成功
+            if(res.data.status === 200) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              this.lights = res.data.lights;
+            }
+            //口令过期或无效
+            else if(res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              this.$router.push('/login');
+            }
+            //其他错误
+            else{
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
           }
         });
       }

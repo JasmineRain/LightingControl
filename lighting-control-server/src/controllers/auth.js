@@ -55,7 +55,7 @@ const auth = {
       } else {
         res.send({
           status: 401,
-          message: "无效口令，请重新登陆"
+          message: "过期口令，请重新登陆"
         })
       }
     })

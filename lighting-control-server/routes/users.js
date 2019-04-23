@@ -65,8 +65,8 @@ router.post('/login', (req, res, next) => {
     }
     if(!user) {
       return res.send({
-        status: 500,
-        message: "用户不存在"
+        status: 403,
+        message: "账号或密码错误"
       })
     }
     else {
@@ -93,8 +93,8 @@ router.post('/login', (req, res, next) => {
         }
         else {
           res.send({
-            status: 500,
-            message: "密码错误"
+            status: 403,
+            message: "账号或密码错误"
           })
         }
       })

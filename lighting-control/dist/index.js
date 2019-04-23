@@ -4116,55 +4116,7 @@ exports.default = {
   name: "lightings",
   data: function data() {
     return {
-      lights: [{
-        row: 1, col: 1, value: 2
-      }, {
-        row: 1, col: 2, value: 2
-      }, {
-        row: 1, col: 3, value: 2
-      }, {
-        row: 1, col: 4, value: 1
-      }, {
-        row: 1, col: 5, value: 2
-      }, {
-        row: 1, col: 6, value: 2
-      }, {
-        row: 2, col: 1, value: 2
-      }, {
-        row: 2, col: 3, value: 2
-      }, {
-        row: 2, col: 4, value: 2
-      }, {
-        row: 2, col: 5, value: 2
-      }, {
-        row: 2, col: 6, value: 2
-      }, {
-        row: 3, col: 1, value: 2
-      }, {
-        row: 3, col: 2, value: 2
-      }, {
-        row: 3, col: 6, value: 2
-      }, {
-        row: 4, col: 2, value: 2
-      }, {
-        row: 4, col: 4, value: 2
-      }, {
-        row: 4, col: 6, value: 2
-      }, {
-        row: 5, col: 1, value: 2
-      }, {
-        row: 5, col: 2, value: 2
-      }, {
-        row: 5, col: 3, value: 2
-      }, {
-        row: 5, col: 4, value: 2
-      }, {
-        row: 5, col: 5, value: 2
-      }, {
-        row: 5, col: 6, value: 2
-      }, {
-        row: 6, col: 4, value: 3
-      }], //模拟灯光数据
+      lights: [], //模拟灯光数据
       loading: false,
       address: 'http://127.0.0.1',
       port: 3000,
@@ -4207,34 +4159,89 @@ exports.default = {
         if (!res.ok) {
           modal.toast({
             message: '请检查网络连接',
-            duration: 2
+            duration: 1
           });
         } else {
           console.log(res.data);
+          //成功
           if (res.data.status === 200) {
-            modal.toast({
-              message: '获取灯光信息',
-              duration: 2
-            });
-            //更新灯光信息
-          } else if (res.data.status === 401) {
-            modal.toast({
-              message: '登陆超时,请重新登陆',
-              duration: 1
-            });
-            _this.$router.push('/login');
-          } else {
             modal.toast({
               message: res.data.message,
               duration: 1
             });
+            _this.lights = res.data.lights;
           }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
         }
       });
     },
 
     clickBulb: function clickBulb(info) {
+      var _this2 = this;
+
       console.log(info);
+      this.loading = true;
+      storage.getItem('token', function (event) {
+        _this2.token = event.data;
+      });
+      var index = this.lights.findIndex(function (light) {
+        return light.row === info.row && light.col === info.col;
+      });
+      var body = JSON.stringify({ type: info.value === 1 ? 'ON' : 'OFF', host: this.lights[index].host, sequence: this.lights[index].sequence });
+      stream.fetch({
+        method: 'POST',
+        url: this.address + ':' + this.port + '/lights/operation',
+        type: 'json',
+        body: body,
+        headers: { 'Authorization': "Bearer " + this.token, 'Content-Type': 'application/json' }
+      }, function (res) {
+        _this2.loading = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 1
+          });
+        } else {
+          console.log(res.data);
+          //成功
+          if (res.data.status === 200) {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+            _this2.lights[index].value = info.value === 1 ? 2 : 1;
+          }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this2.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
+        }
+      });
     }
 
     // handleTableRowScroll: function (e) {
@@ -6328,8 +6335,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         on: {
           "click": function($event) {
             _vm.clickBulb({
-              row: cindex,
-              col: rindex,
+              row: cindex + 1,
+              col: rindex + 1,
               value: col
             })
           }
@@ -6346,8 +6353,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         on: {
           "click": function($event) {
             _vm.clickBulb({
-              row: cindex,
-              col: rindex,
+              row: cindex + 1,
+              col: rindex + 1,
               value: col
             })
           }
@@ -6528,7 +6535,7 @@ exports.default = {
       if (this.username === '' || this.password === '') {
         modal.toast({
           message: '账号名或密码不能为空',
-          duration: 2
+          duration: 1
         });
         return;
       }
@@ -6546,23 +6553,26 @@ exports.default = {
         if (!res.ok) {
           modal.toast({
             message: '请检查网络连接',
-            duration: 2
+            duration: 1
           });
         } else {
+          //成功
           if (res.data.status === 200) {
-            modal.toast({
-              message: '登陆成功',
-              duration: 2
-            });
-            storage.setItem('token', res.data.token, function (event) {
-              _this.$router.push('/home');
-            });
-          } else {
             modal.toast({
               message: res.data.message,
               duration: 1
             });
+            storage.setItem('token', res.data.token, function (event) {
+              _this.$router.push('/home');
+            });
           }
+          //错误
+          else {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
         }
       });
     }
@@ -7297,13 +7307,32 @@ exports.default = {
         if (!res.ok) {
           modal.toast({
             message: '请检查网络连接',
-            duration: 2
+            duration: 1
           });
         } else {
-          modal.toast({
-            message: res.data.message,
-            duration: 2
-          });
+          //成功
+          if (res.data.status === 200) {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+            _this.lights = res.data.lights;
+          }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
         }
       });
     }

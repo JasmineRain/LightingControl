@@ -34,8 +34,8 @@
                   <div class="col" v-for="(col, cindex) in row">
                     <!--<text>aaa</text>-->
                     <image v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
-                    <image @click="clickBulb({row: cindex, col: rindex, value: col})" v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
-                    <image @click="clickBulb({row: cindex, col: rindex, value: col})" v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
+                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
+                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
                     <image v-if="col === 3" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
                   </div>
                 </div>
@@ -59,57 +59,7 @@
     name: "lightings",
     data() {
       return {
-        lights: [
-          {
-            row: 1, col: 1, value: 2
-          }, {
-            row: 1, col: 2, value: 2
-          }, {
-            row: 1, col: 3, value: 2
-          }, {
-            row: 1, col: 4, value: 1
-          }, {
-            row: 1, col: 5, value: 2
-          }, {
-            row: 1, col: 6, value: 2
-          },{
-            row: 2, col: 1, value: 2
-          }, {
-            row: 2, col: 3, value: 2
-          }, {
-            row: 2, col: 4, value: 2
-          },{
-            row: 2, col: 5, value: 2
-          },{
-            row: 2, col: 6, value: 2
-          }, {
-            row: 3, col: 1, value: 2
-          }, {
-            row: 3, col: 2, value: 2
-          }, {
-            row: 3, col: 6, value: 2
-          }, {
-            row: 4, col: 2, value: 2
-          }, {
-            row: 4, col: 4, value: 2
-          }, {
-            row: 4, col: 6, value: 2
-          }, {
-            row: 5, col: 1, value: 2
-          }, {
-            row: 5, col: 2, value: 2
-          }, {
-            row: 5, col: 3, value: 2
-          }, {
-            row: 5, col: 4, value: 2
-          }, {
-            row: 5, col: 5, value: 2
-          }, {
-            row: 5, col: 6, value: 2
-          }, {
-            row: 6, col: 4, value: 3
-          }
-        ],  //模拟灯光数据
+        lights: [],  //模拟灯光数据
         loading: false,
         address: 'http://127.0.0.1',
         port: 3000,
@@ -151,25 +101,28 @@
           if(!res.ok){
             modal.toast({
               message: '请检查网络连接',
-              duration: 2
+              duration: 1
             });
           }
           else{
             console.log(res.data);
+            //成功
             if(res.data.status === 200) {
               modal.toast({
-                message: '获取灯光信息',
-                duration: 2
+                message: res.data.message,
+                duration: 1
               });
-              //更新灯光信息
+              this.lights = res.data.lights;
             }
+            //口令过期或无效
             else if(res.data.status === 401) {
               modal.toast({
-                message: '登陆超时,请重新登陆',
+                message: res.data.message,
                 duration: 1
               });
               this.$router.push('/login');
             }
+            //其他错误
             else{
               modal.toast({
                 message: res.data.message,
@@ -182,6 +135,55 @@
 
       clickBulb: function (info) {
         console.log(info);
+        this.loading = true;
+        storage.getItem('token', event => {
+          this.token = event.data;
+        });
+        let index = this.lights.findIndex(function (light) {
+          return light.row === info.row && light.col === info.col
+        });
+        const body = JSON.stringify({type: info.value === 1? 'ON' : 'OFF' ,host: this.lights[index].host, sequence: this.lights[index].sequence});
+        stream.fetch({
+          method: 'POST',
+          url: this.address + ':' + this.port + '/lights/operation',
+          type: 'json',
+          body: body,
+          headers: {'Authorization': "Bearer " + this.token, 'Content-Type': 'application/json'}
+        }, (res) => {
+          this.loading = false;
+          if(!res.ok){
+            modal.toast({
+              message: '请检查网络连接',
+              duration: 1
+            });
+          }
+          else{
+            console.log(res.data);
+            //成功
+            if(res.data.status === 200) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              this.lights[index].value = info.value === 1? 2 : 1
+            }
+            //口令过期或无效
+            else if(res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              this.$router.push('/login');
+            }
+            //其他错误
+            else{
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
+          }
+        });
       }
 
       // handleTableRowScroll: function (e) {

@@ -51,7 +51,7 @@
         if(this.username ==='' || this.password === '') {
           modal.toast({
             message: '账号名或密码不能为空',
-            duration: 2
+            duration: 1
           });
           return;
         }
@@ -70,20 +70,22 @@
           if(!res.ok){
             modal.toast({
               message: '请检查网络连接',
-              duration: 2
+              duration: 1
             });
           }
           else{
+            //成功
             if(res.data.status === 200) {
               modal.toast({
-                message: '登陆成功',
-                duration: 2
+                message: res.data.message,
+                duration: 1
               });
               storage.setItem('token', res.data.token, event => {
                 this.$router.push('/home');
               });
 
             }
+            //错误
             else{
               modal.toast({
                 message: res.data.message,
