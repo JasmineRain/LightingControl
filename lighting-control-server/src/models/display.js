@@ -7,7 +7,7 @@ let displaySchema = mongoose.Schema({
     col: Number,
     value: Number,
     host: Number,
-    sequence: Number
+    seq: Number
   }]
 });
 

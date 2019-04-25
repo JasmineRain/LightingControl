@@ -15,7 +15,7 @@ router.use(auth.jwtCheck, auth.noAuthenticateCheck, auth.redisCheck);
 
 router.get('/info', (req, res, next) => {
 
-  global.socket.write(`{'type': 'GET'}`);
+  global.socket.write(`{"type": "GET"}`);
 
   let classroom = 1;
 
@@ -37,10 +37,10 @@ router.get('/info', (req, res, next) => {
         let lights = JSON.parse(data).lights;
         lights.forEach(function (item) {
           let e = d.find(function (element) {
-            return element.host === item.host && element.sequence === item.sequence;
+            return element.host === item.host && element.seq === item.seq;
           });
           info.push({
-            row: e.row, col: e.col, value: item.sw === 'ON' ?  2 : 1, host: item.host, sequence: item.sequence
+            row: e.row, col: e.col, value: item.sw === 'ON' ?  2 : 1, host: item.host, seq: item.seq
           })
         });
       }
@@ -56,7 +56,7 @@ router.get('/info', (req, res, next) => {
 router.post('/operation', (req, res, next) => {
 
   global.socket.write(`{
-    'type': 'SET_TURN_${req.body.type}', 'light': [{'host': '${req.body.host}', 'sequence': '${req.body.sequence}'}]
+    "type": "SET_TURN_${req.body.type}", "host":"${req.body.host}", "seq": "${req.body.seq}"}
   }`);
 
   global.socket.once('data', function (data) {

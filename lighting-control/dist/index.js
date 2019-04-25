@@ -4201,7 +4201,7 @@ exports.default = {
       var index = this.lights.findIndex(function (light) {
         return light.row === info.row && light.col === info.col;
       });
-      var body = JSON.stringify({ type: info.value === 1 ? 'ON' : 'OFF', host: this.lights[index].host, sequence: this.lights[index].sequence });
+      var body = JSON.stringify({ type: info.value === 1 ? 'ON' : 'OFF', host: this.lights[index].host, seq: this.lights[index].seq });
       stream.fetch({
         method: 'POST',
         url: this.address + ':' + this.port + '/lights/operation',
@@ -7192,14 +7192,14 @@ exports.default = {
     return {
       room: 0,
       display: [{
-        row: 1, col: 1, value: 2, host: 0, sequence: 0
+        row: 1, col: 1, value: 2, host: 0, seq: 0
       }], //模拟灯光数据
       light: {
         row: 1,
         col: 1,
         value: 0, //0-空，1-灯灭， 2-灯亮， 3-开关
         host: 0,
-        sequence: 0
+        seq: 0
       },
       sending: false,
       address: 'http://127.0.0.1',
@@ -7241,7 +7241,7 @@ exports.default = {
       this.light.host = e.value;
     },
     setSeq: function setSeq(e) {
-      this.light.sequence = e.value;
+      this.light.seq = e.value;
     },
 
     //实时查看输入
@@ -7279,7 +7279,7 @@ exports.default = {
         col: this.light.col,
         value: this.light.value,
         host: this.light.host,
-        sequence: this.light.sequence
+        seq: this.light.seq
       });
     },
 

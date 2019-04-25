@@ -104,7 +104,7 @@
         room: 0,
         display: [
           {
-            row: 1, col: 1, value: 2, host: 0, sequence: 0
+            row: 1, col: 1, value: 2, host: 0, seq: 0
           }
         ],  //模拟灯光数据
         light: {
@@ -112,7 +112,7 @@
           col: 1,
           value: 0,  //0-空，1-灯灭， 2-灯亮， 3-开关
           host: 0,
-          sequence: 0
+          seq: 0
         },
         sending: false,
         address: 'http://127.0.0.1',
@@ -155,7 +155,7 @@
         this.light.host = e.value;
       },
       setSeq: function(e) {
-        this.light.sequence = e.value;
+        this.light.seq = e.value;
       },
 
       //实时查看输入
@@ -171,7 +171,7 @@
           col: this.light.col,
           value: this.light.value,
           host: this.light.host,
-          sequence: this.light.sequence
+          seq: this.light.seq
         })
       },
 

@@ -142,7 +142,7 @@
         let index = this.lights.findIndex(function (light) {
           return light.row === info.row && light.col === info.col
         });
-        const body = JSON.stringify({type: info.value === 1? 'ON' : 'OFF' ,host: this.lights[index].host, sequence: this.lights[index].sequence});
+        const body = JSON.stringify({type: info.value === 1? 'ON' : 'OFF' ,host: this.lights[index].host, seq: this.lights[index].seq});
         stream.fetch({
           method: 'POST',
           url: this.address + ':' + this.port + '/lights/operation',
