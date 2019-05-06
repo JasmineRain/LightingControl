@@ -510,7 +510,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(32);
+var _index = __webpack_require__(22);
 
 Object.defineProperty(exports, 'default', {
   enumerable: true,
@@ -532,7 +532,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _index = __webpack_require__(55);
+var _index = __webpack_require__(32);
 
 Object.defineProperty(exports, 'default', {
   enumerable: true,
@@ -545,6 +545,28 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 /***/ }),
 /* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _index = __webpack_require__(55);
+
+Object.defineProperty(exports, 'default', {
+  enumerable: true,
+  get: function get() {
+    return _interopRequireDefault(_index).default;
+  }
+});
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/***/ }),
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -8963,28 +8985,6 @@ if (inBrowser) {
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3), __webpack_require__(10).setImmediate))
 
 /***/ }),
-/* 7 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _index = __webpack_require__(22);
-
-Object.defineProperty(exports, 'default', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_index).default;
-  }
-});
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-/***/ }),
 /* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -9035,7 +9035,7 @@ module.exports = Component.exports
 "use strict";
 
 
-var _vue = __webpack_require__(6);
+var _vue = __webpack_require__(7);
 
 var _vue2 = _interopRequireDefault(_vue);
 
@@ -21286,7 +21286,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.router = undefined;
 
-var _vue = __webpack_require__(6);
+var _vue = __webpack_require__(7);
 
 var _vue2 = _interopRequireDefault(_vue);
 
@@ -24084,11 +24084,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcLoading = __webpack_require__(7);
+var _wxcLoading = __webpack_require__(4);
 
 var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
 
-var _wxcMinibar = __webpack_require__(4);
+var _wxcMinibar = __webpack_require__(5);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
@@ -24156,55 +24156,7 @@ exports.default = {
   name: "lightings",
   data: function data() {
     return {
-      lights: [{
-        row: 1, col: 1, value: 2
-      }, {
-        row: 1, col: 2, value: 2
-      }, {
-        row: 1, col: 3, value: 2
-      }, {
-        row: 1, col: 4, value: 1
-      }, {
-        row: 1, col: 5, value: 2
-      }, {
-        row: 1, col: 6, value: 2
-      }, {
-        row: 2, col: 1, value: 2
-      }, {
-        row: 2, col: 3, value: 2
-      }, {
-        row: 2, col: 4, value: 2
-      }, {
-        row: 2, col: 5, value: 2
-      }, {
-        row: 2, col: 6, value: 2
-      }, {
-        row: 3, col: 1, value: 2
-      }, {
-        row: 3, col: 2, value: 2
-      }, {
-        row: 3, col: 6, value: 2
-      }, {
-        row: 4, col: 2, value: 2
-      }, {
-        row: 4, col: 4, value: 2
-      }, {
-        row: 4, col: 6, value: 2
-      }, {
-        row: 5, col: 1, value: 2
-      }, {
-        row: 5, col: 2, value: 2
-      }, {
-        row: 5, col: 3, value: 2
-      }, {
-        row: 5, col: 4, value: 2
-      }, {
-        row: 5, col: 5, value: 2
-      }, {
-        row: 5, col: 6, value: 2
-      }, {
-        row: 6, col: 4, value: 3
-      }], //模拟灯光数据
+      lights: [], //模拟灯光数据
       loading: false,
       address: 'http://127.0.0.1',
       port: 3000,
@@ -24235,7 +24187,6 @@ exports.default = {
 
       this.loading = true;
       storage.getItem('token', function (event) {
-        console.log('get value:', event.data);
         _this.token = event.data;
       });
       stream.fetch({
@@ -24248,28 +24199,87 @@ exports.default = {
         if (!res.ok) {
           modal.toast({
             message: '请检查网络连接',
-            duration: 2
+            duration: 1
           });
         } else {
           console.log(res.data);
+          //成功
           if (res.data.status === 200) {
-            modal.toast({
-              message: '获取灯光信息',
-              duration: 2
-            });
-            //更新灯光信息
-          } else if (res.data.status === 401) {
-            modal.toast({
-              message: '登陆超时,请重新登陆',
-              duration: 1
-            });
-            _this.$router.push('/login');
-          } else {
             modal.toast({
               message: res.data.message,
               duration: 1
             });
+            _this.lights = res.data.lights;
           }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
+        }
+      });
+    },
+
+    clickBulb: function clickBulb(info) {
+      var _this2 = this;
+
+      console.log(info);
+      this.loading = true;
+      storage.getItem('token', function (event) {
+        _this2.token = event.data;
+      });
+      var index = this.lights.findIndex(function (light) {
+        return light.row === info.row && light.col === info.col;
+      });
+      var body = JSON.stringify({ type: info.value === 1 ? 'ON' : 'OFF', host: this.lights[index].host, seq: this.lights[index].seq });
+      stream.fetch({
+        method: 'POST',
+        url: this.address + ':' + this.port + '/lights/operation',
+        type: 'json',
+        body: body,
+        headers: { 'Authorization': "Bearer " + this.token, 'Content-Type': 'application/json' }
+      }, function (res) {
+        _this2.loading = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 1
+          });
+        } else {
+          console.log(res.data);
+          //成功
+          if (res.data.status === 200) {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+            _this2.lights[index].value = info.value === 1 ? 2 : 1;
+          }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this2.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
         }
       });
     }
@@ -24343,7 +24353,7 @@ exports.default = {
     }
   },
   mounted: function mounted() {
-    //this.getLightsInfo();
+    this.getLightsInfo();
   }
 };
 
@@ -26087,7 +26097,7 @@ exports = module.exports = __webpack_require__(0)(false);
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
 
 // exports
 
@@ -26139,19 +26149,19 @@ exports.default = {
   name: "menu",
   methods: {
     handleClick: function handleClick() {
-      this.$router.push('/new');
-      // storage.getItem('token', event => {
-      //   let role = JSON.parse(atob(event.data.split('.')[1])).role;
-      //   if(role >=50 ) {
-      //     this.$router.push('/new');
-      //   }
-      //   else{
-      //     modal.toast({
-      //       message: '权限不足',
-      //       duration: 1
-      //     });
-      //   }
-      // });
+      var _this = this;
+
+      storage.getItem('token', function (event) {
+        var role = JSON.parse(atob(event.data.split('.')[1])).role;
+        if (role >= 50) {
+          _this.$router.push('/new');
+        } else {
+          modal.toast({
+            message: '权限不足',
+            duration: 1
+          });
+        }
+      });
     }
   }
 };
@@ -26562,9 +26572,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_bulb_off.png",
-          "data-img-src": "file:///android_asset/images/img_bulb_off.png",
-          "weex-type": "image"
+          "src": _vm.offSrc,
+          "data-img-src": _vm.offSrc,
+          "weex-type": "image",
+          "data-evt-click": ""
+        },
+        on: {
+          "click": _vm.$stopOuterA,
+          "weex$tap": function($event) {
+            $event.stopPropagation();
+            return _vm.clickBulb({
+              row: cindex + 1,
+              col: rindex + 1,
+              value: col
+            })
+          }
         }
       }) : _vm._e(), _vm._v(" "), (col === 2) ? _c('figure', {
         staticClass: " weex-el weex-image",
@@ -26574,9 +26596,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_bulb_on.png",
-          "data-img-src": "file:///android_asset/images/img_bulb_on.png",
-          "weex-type": "image"
+          "src": _vm.onSrc,
+          "data-img-src": _vm.onSrc,
+          "weex-type": "image",
+          "data-evt-click": ""
+        },
+        on: {
+          "click": _vm.$stopOuterA,
+          "weex$tap": function($event) {
+            $event.stopPropagation();
+            return _vm.clickBulb({
+              row: cindex + 1,
+              col: rindex + 1,
+              value: col
+            })
+          }
         }
       }) : _vm._e(), _vm._v(" "), (col === 3) ? _c('figure', {
         staticClass: " weex-el weex-image",
@@ -26586,8 +26620,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_control.png",
-          "data-img-src": "file:///android_asset/images/img_control.png",
+          "src": _vm.switcherSrc,
+          "data-img-src": _vm.switcherSrc,
           "weex-type": "image"
         }
       }) : _vm._e()])
@@ -26653,11 +26687,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcLoading = __webpack_require__(7);
+var _wxcLoading = __webpack_require__(4);
 
 var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
 
-var _wxcButton = __webpack_require__(5);
+var _wxcButton = __webpack_require__(6);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 
@@ -26712,52 +26746,51 @@ exports.default = {
       this.password = e.value;
     },
     login: function login() {
-      this.$router.push('/home');
+      var _this = this;
 
-      // if(this.username ==='' || this.password === '') {
-      //   modal.toast({
-      //     message: '账号名或密码不能为空',
-      //     duration: 2
-      //   });
-      //   return;
-      // }
-      // if(this.loading)
-      //   return;
-      // this.loading = true;
-      // const body = JSON.stringify({username: this.username, password: this.password});
-      // stream.fetch({
-      //   method: 'POST',
-      //   url: this.address + ':' + this.port + '/users/login',
-      //   type: 'json',
-      //   body: body,
-      //   headers: {'Content-Type': 'application/json'}
-      // }, (res) => {
-      //   this.loading = false;
-      //   if(!res.ok){
-      //     modal.toast({
-      //       message: '请检查网络连接',
-      //       duration: 2
-      //     });
-      //   }
-      //   else{
-      //     if(res.data.status === 200) {
-      //       modal.toast({
-      //         message: '登陆成功',
-      //         duration: 2
-      //       });
-      //       storage.setItem('token', res.data.token, event => {
-      //         this.$router.push('/home');
-      //       });
-      //
-      //     }
-      //     else{
-      //       modal.toast({
-      //         message: res.data.message,
-      //         duration: 1
-      //       });
-      //     }
-      //   }
-      // });
+      if (this.username === '' || this.password === '') {
+        modal.toast({
+          message: '账号名或密码不能为空',
+          duration: 1
+        });
+        return;
+      }
+      if (this.loading) return;
+      this.loading = true;
+      var body = JSON.stringify({ username: this.username, password: this.password });
+      stream.fetch({
+        method: 'POST',
+        url: this.address + ':' + this.port + '/users/login',
+        type: 'json',
+        body: body,
+        headers: { 'Content-Type': 'application/json' }
+      }, function (res) {
+        _this.loading = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 1
+          });
+        } else {
+          //成功
+          if (res.data.status === 200) {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+            storage.setItem('token', res.data.token, function (event) {
+              _this.$router.push('/home');
+            });
+          }
+          //错误
+          else {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+            }
+        }
+      });
     }
   },
   computed: {
@@ -27104,8 +27137,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "height": "1.84rem"
     },
     attrs: {
-      "src": "file:///android_asset/images/img_bulb.png",
-      "data-img-src": "file:///android_asset/images/img_bulb.png",
+      "src": _vm.bulbSrc,
+      "data-img-src": _vm.bulbSrc,
       "weex-type": "image"
     }
   })]), _vm._v(" "), _c('div', {
@@ -27141,8 +27174,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "height": "0.46667rem"
     },
     attrs: {
-      "src": "file:///android_asset/images/btn_delete.png",
-      "data-img-src": "file:///android_asset/images/btn_delete.png",
+      "src": _vm.deleteSrc,
+      "data-img-src": _vm.deleteSrc,
       "weex-type": "image"
     }
   })]), _vm._v(" "), _c('div', {
@@ -27173,8 +27206,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "height": "0.46667rem"
     },
     attrs: {
-      "src": "file:///android_asset/images/btn_delete.png",
-      "data-img-src": "file:///android_asset/images/btn_delete.png",
+      "src": _vm.deleteSrc,
+      "data-img-src": _vm.deleteSrc,
       "weex-type": "image"
     }
   })])]), _vm._v(" "), _c('div', {
@@ -27305,11 +27338,15 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcMinibar = __webpack_require__(4);
+var _wxcLoading = __webpack_require__(4);
+
+var _wxcLoading2 = _interopRequireDefault(_wxcLoading);
+
+var _wxcMinibar = __webpack_require__(5);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
-var _wxcButton = __webpack_require__(5);
+var _wxcButton = __webpack_require__(6);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 
@@ -27319,51 +27356,169 @@ var _wxcStepper2 = _interopRequireDefault(_wxcStepper);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var stream = weex.requireModule('stream'); //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+var storage = weex.requireModule('storage');
+var modal = weex.requireModule('modal');
 exports.default = {
   name: "extend",
-  components: { WxcStepper: _wxcStepper2.default, WxcButton: _wxcButton2.default, WxcMinibar: _wxcMinibar2.default },
+  components: { WxcStepper: _wxcStepper2.default, WxcButton: _wxcButton2.default, WxcMinibar: _wxcMinibar2.default, WxcLoading: _wxcLoading2.default },
   data: function data() {
     return {
-      lights: [{
-        row: 1, col: 1, value: 2
+      room: 0,
+      display: [{
+        row: 1, col: 1, value: 2, host: 0, seq: 0
       }], //模拟灯光数据
       light: {
         row: 1,
         col: 1,
-        value: 0 //0-空，1-灯灭， 2-灯亮， 3-开关
-      }
+        value: 0, //0-空，1-灯灭， 2-灯亮， 3-开关
+        host: 0,
+        seq: 0
+      },
+      sending: false,
+      address: 'http://127.0.0.1',
+      port: 3000,
+      token: ''
     };
   },
 
   methods: {
+
+    //动态计算矩阵大小
     calc: function calc(data) {
       var rmax = 0;
       var cmax = 0;
       data.forEach(function (item) {
-        // if (item.value === 1 || item.value === 2 || item.value === 3) {
-        //
-        // }
         if (item.row > rmax) rmax = item.row;
         if (item.col > cmax) cmax = item.col;
       });
       return { row: rmax, col: cmax };
     },
+
+    //绑定输入
     setRow: function setRow(e) {
       this.light.row = e.value;
     },
     setCol: function setCol(e) {
       this.light.col = e.value;
     },
+
+    //1-无   2-灯   3-开关
     setValue: function setValue(e) {
       this.light.value = e.value;
     },
+
+    setRoom: function setRoom(e) {
+      this.room = e.value;
+    },
+    setHost: function setHost(e) {
+      this.light.host = e.value;
+    },
+    setSeq: function setSeq(e) {
+      this.light.seq = e.value;
+    },
+
+    //实时查看输入
     add: function add() {
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
       var _iteratorError = undefined;
 
       try {
-        for (var _iterator = this.lights[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        for (var _iterator = this.display[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
           var item = _step.value;
 
           if (item.row === this.light.row && item.col === this.light.col) {
@@ -27386,15 +27541,74 @@ exports.default = {
         }
       }
 
-      this.lights.push({ row: this.light.row, col: this.light.col, value: this.light.value });
+      this.display.push({
+        row: this.light.row,
+        col: this.light.col,
+        value: this.light.value,
+        host: this.light.host,
+        seq: this.light.seq
+      });
     },
+
+    minibarLeftButtonClick: function minibarLeftButtonClick() {},
+
+    //提交到服务器
     commit: function commit() {
-      console.log("commit to server");
+      var _this = this;
+
+      if (this.sending) return;
+      storage.getItem('token', function (event) {
+        console.log('get value:', event.data);
+        _this.token = event.data;
+      });
+      this.sending = true;
+      var body = JSON.stringify({ room: this.room, display: this.display });
+      stream.fetch({
+        method: 'POST',
+        url: this.address + ':' + this.port + '/lights/new',
+        type: 'json',
+        body: body,
+        headers: { 'Content-Type': 'application/json', 'Authorization': "Bearer " + this.token }
+      }, function (res) {
+        _this.sending = false;
+        if (!res.ok) {
+          modal.toast({
+            message: '请检查网络连接',
+            duration: 1
+          });
+        } else {
+          //成功
+          if (res.data.status === 200) {
+            modal.toast({
+              message: res.data.message,
+              duration: 1
+            });
+            _this.lights = res.data.lights;
+          }
+          //口令过期或无效
+          else if (res.data.status === 401) {
+              modal.toast({
+                message: res.data.message,
+                duration: 1
+              });
+              _this.$router.push('/login');
+            }
+            //其他错误
+            else {
+                modal.toast({
+                  message: res.data.message,
+                  duration: 1
+                });
+              }
+        }
+      });
     }
   },
   computed: {
+
+    //灯光数据调整  因UI显示不同
     rect: function rect() {
-      var size = this.calc(this.lights);
+      var size = this.calc(this.display);
       var bulbs = new Array(size.col);
       for (var i = 0; i < size.col; i++) {
         bulbs[i] = new Array(size.row);
@@ -27409,13 +27623,15 @@ exports.default = {
       //1,3 - 3,5 - 3,1
       //1,6 - 6,5 - 6,1
       //2,1 - 1,4 - 1,2
-      if (this.lights.length !== 0) {
-        this.lights.forEach(function (light) {
+      if (this.display.length !== 0) {
+        this.display.forEach(function (light) {
           bulbs[light.col - 1][light.row - 1] = light.value;
         });
       }
       return bulbs;
     },
+
+    //灯光开路径
     onSrc: function onSrc() {
       switch (WXEnvironment.platform) {
         case 'Web':
@@ -27426,6 +27642,8 @@ exports.default = {
           return "local://img_bulb_on.png";
       }
     },
+
+    //灯光关路径
     offSrc: function offSrc() {
       switch (WXEnvironment.platform) {
         case 'Web':
@@ -27436,6 +27654,8 @@ exports.default = {
           return "local://img_bulb_off.png";
       }
     },
+
+    //开关路径
     switcherSrc: function switcherSrc() {
       switch (WXEnvironment.platform) {
         case 'Web':
@@ -27447,95 +27667,7 @@ exports.default = {
       }
     }
   }
-}; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+};
 
 /***/ }),
 /* 66 */
@@ -27928,7 +28060,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "weex-type": "div"
     }
-  }, [_c('div', {
+  }, [_c('Wxc-loading', {
+    attrs: {
+      "show": _vm.sending,
+      "need-mask": true,
+      "type": "trip"
+    }
+  }), _vm._v(" "), _c('div', {
     staticClass: "nav weex-ct weex-div",
     attrs: {
       "weex-type": "div"
@@ -27999,8 +28137,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_bulb_off.png",
-          "data-img-src": "file:///android_asset/images/img_bulb_off.png",
+          "src": _vm.offSrc,
+          "data-img-src": _vm.offSrc,
           "weex-type": "image"
         }
       }) : _vm._e(), _vm._v(" "), (col === 2) ? _c('figure', {
@@ -28011,8 +28149,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_bulb_on.png",
-          "data-img-src": "file:///android_asset/images/img_bulb_on.png",
+          "src": _vm.onSrc,
+          "data-img-src": _vm.onSrc,
           "weex-type": "image"
         }
       }) : _vm._e(), _vm._v(" "), (col === 3) ? _c('figure', {
@@ -28023,8 +28161,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
           "margin": "0.26667rem"
         },
         attrs: {
-          "src": "file:///android_asset/images/img_control.png",
-          "data-img-src": "file:///android_asset/images/img_control.png",
+          "src": _vm.switcherSrc,
+          "data-img-src": _vm.switcherSrc,
           "weex-type": "image"
         }
       }) : _vm._e()])
@@ -28048,7 +28186,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "default-value": 1,
       "step": "1",
-      "min": "1"
+      "min": "1",
+      "data-evt-wxcStepperValueChanged": ""
+    },
+    on: {
+      "wxcStepperValueChanged": _vm.setRoom
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "count weex-ct weex-div",
@@ -28084,7 +28226,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     attrs: {
       "default-value": 1,
       "step": "1",
-      "min": "0",
+      "min": "1",
       "data-evt-wxcStepperValueChanged": ""
     },
     on: {
@@ -28131,7 +28273,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "default-value": 1,
       "step": "1",
       "min": "0",
-      "max": "15"
+      "max": "15",
+      "data-evt-wxcStepperValueChanged": ""
+    },
+    on: {
+      "wxcStepperValueChanged": _vm.setHost
     }
   })], 1), _vm._v(" "), _c('div', {
     staticClass: "count weex-ct weex-div",
@@ -28148,7 +28294,11 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       "default-value": 1,
       "step": "1",
       "min": "0",
-      "max": "15"
+      "max": "15",
+      "data-evt-wxcStepperValueChanged": ""
+    },
+    on: {
+      "wxcStepperValueChanged": _vm.setSeq
     }
   })], 1)]), _vm._v(" "), _c('div', {
     staticClass: "btns weex-ct weex-div",
@@ -28191,7 +28341,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "wxcButtonClicked": _vm.commit
     }
-  })], 1)])], 1)])
+  })], 1)])], 1)], 1)
 },staticRenderFns: []}
 module.exports.render._withStripped = true
 if (false) {
@@ -28296,11 +28446,11 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _wxcMinibar = __webpack_require__(4);
+var _wxcMinibar = __webpack_require__(5);
 
 var _wxcMinibar2 = _interopRequireDefault(_wxcMinibar);
 
-var _wxcButton = __webpack_require__(5);
+var _wxcButton = __webpack_require__(6);
 
 var _wxcButton2 = _interopRequireDefault(_wxcButton);
 

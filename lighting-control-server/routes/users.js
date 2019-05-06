@@ -56,6 +56,7 @@ router.post('/register', (req, res, next) => {
 
 router.post('/login', (req, res, next) => {
   const u = req.body;
+  console.log(u);
   userModel.findOne({username: u.username}, function (err, user) {
     if(err) {
       return res.send({

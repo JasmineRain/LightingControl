@@ -4130,7 +4130,7 @@ exports.default = {
       var rmax = 0;
       var cmax = 0;
       data.forEach(function (item) {
-        if (item.value === 1 || item.value === 2 || item.value === 3) {
+        if (item.sw === 1 || item.sw === 2 || item.sw === 3) {
           if (item.row > rmax) rmax = item.row;
           if (item.col > cmax) cmax = item.col;
         }
@@ -4277,7 +4277,7 @@ exports.default = {
       //1,6 - 6,5 - 6,1
       //2,1 - 1,4 - 1,2
       this.lights.forEach(function (light) {
-        bulbs[light.col - 1][light.row - 1] = light.value;
+        bulbs[light.col - 1][light.row - 1] = light.sw;
       });
       return bulbs;
     },

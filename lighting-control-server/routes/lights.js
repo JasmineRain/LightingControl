@@ -15,7 +15,7 @@ router.use(auth.jwtCheck, auth.noAuthenticateCheck, auth.redisCheck);
 
 router.get('/info', (req, res, next) => {
 
-  global.socket.write(`{"type": "GET"}`);
+  global.socket.write(`\\t{"type": "GET"}\\n`);
 
   let classroom = 1;
 
@@ -40,7 +40,7 @@ router.get('/info', (req, res, next) => {
             return element.host === item.host && element.seq === item.seq;
           });
           info.push({
-            row: e.row, col: e.col, value: item.sw === 'ON' ?  2 : 1, host: item.host, seq: item.seq
+            row: e.row, col: e.col, sw: item.sw === 1 ?  1 : 0, host: item.host, seq: item.seq
           })
         });
       }
@@ -55,9 +55,9 @@ router.get('/info', (req, res, next) => {
 
 router.post('/operation', (req, res, next) => {
 
-  global.socket.write(`{
+  global.socket.write(`\\t{
     "type": "SET_TURN_${req.body.type}", "host":"${req.body.host}", "seq": "${req.body.seq}"}
-  }`);
+  }\\n`);
 
   global.socket.once('data', function (data) {
     console.log(data.toString());

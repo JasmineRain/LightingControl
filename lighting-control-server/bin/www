@@ -8,17 +8,39 @@ const app = require('../app');
 const debug = require('debug')('lighting-control-server:server');
 const http = require('http');
 const net = require('net');
+const dgram = require('dgram');
+const os = require('os');
+
+
+/**
+ * Get port of server and send UDP broadcast.
+ */
+
+let serverInterface = os.networkInterfaces();
+let SERVERIP = '';
+for (info in serverInterface.WLAN) {
+  if(info.family==='IPv4'){
+    SERVERIP = info.address;
+  }
+}
+console.log(SERVERIP);
+
+
 
 /**
  * Get port from environment and store in Express.
  */
-
+//for HTTP server
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 //for socket server
-const HOST = '0.0.0.0';       //定义服务器地址
-const PORT = 4000;            //定义端口号
+const SOCKETHOST = '0.0.0.0';       //定义服务器地址
+const SOCKETPORT = 4000;            //定义端口号
+
+//for UDP server
+const UDPHOST = '0.0.0.0';
+const UDPPORT = 4001;
 
 
 /**
@@ -28,6 +50,8 @@ const PORT = 4000;            //定义端口号
 const server = http.createServer(app);
 
 const socketServer = net.createServer();
+
+const udpServer = dgram.createSocket('udp4');
 
 
 /**
@@ -43,8 +67,8 @@ server.on('listening', onListening);
 
 
 //TCP服务器开始监听特定端口
-socketServer.listen(PORT, HOST, function () {
-  console.info('Socket server is running on port ' + PORT);
+socketServer.listen(SOCKETPORT, SOCKETHOST, function () {
+  console.info('Socket server is running on port ' + SOCKETPORT);
 });
 
 socketServer.on('connection', function(socket) {
@@ -69,6 +93,20 @@ socketServer.on('connection', function(socket) {
   });
 
 });
+
+//UDP服务器发送广播
+
+function intervalFunc() {
+  udpServer.send(`\\t${SERVERIP}\\n`, 4002, '255.255.255.255', function () {
+    //console.log("UDP package sent to " + SERVERIP + ":" + 4002);
+  });
+}
+
+setInterval(intervalFunc, 1500);
+
+
+
+
 /**
  * Normalize a port into a number, string, or false.
  */
