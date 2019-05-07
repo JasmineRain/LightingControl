@@ -18,13 +18,12 @@ const os = require('os');
 
 let serverInterface = os.networkInterfaces();
 let SERVERIP = '';
-for (info in serverInterface.WLAN) {
-  if(info.family==='IPv4'){
-    SERVERIP = info.address;
+serverInterface.WLAN.forEach(function (item) {
+  if(item.family==='IPv4'){
+    SERVERIP = item.address;
   }
-}
-console.log(SERVERIP);
-
+});
+console.log(serverInterface);
 
 
 /**
@@ -52,6 +51,9 @@ const server = http.createServer(app);
 const socketServer = net.createServer();
 
 const udpServer = dgram.createSocket('udp4');
+udpServer.bind(function () {
+  udpServer.setBroadcast(true);
+});
 
 
 /**
@@ -94,13 +96,35 @@ socketServer.on('connection', function(socket) {
 
 });
 
-//UDP服务器发送广播
-
 function intervalFunc() {
-  udpServer.send(`\\t${SERVERIP}\\n`, 4002, '255.255.255.255', function () {
-    //console.log("UDP package sent to " + SERVERIP + ":" + 4002);
+  let message = new Buffer(`\t${SERVERIP}\n`);
+  udpServer.send(message, 0, message.length, 4002, '255.255.255.255', function(err, bytes) {
+    //console.log("UDP package sent from " + SERVERIP);
   });
 }
+
+
+
+
+
+
+// udpServer.on("error", function (err) {
+//   console.log("server error:\n" + err.stack);
+//   server.close();
+// });
+//
+// udpServer.on("message", function (msg, rinfo) {
+//   console.log("server got: " + msg + " from " +
+//     rinfo.address + ":" + rinfo.port);
+// });
+//
+// udpServer.on("listening", function () {
+//   var address = udpServer.address();
+//   console.log("server listening " +
+//     address.address + ":" + address.port);
+// });
+
+// udpServer.bind(41234);
 
 setInterval(intervalFunc, 1500);
 

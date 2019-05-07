@@ -15,7 +15,7 @@ router.use(auth.jwtCheck, auth.noAuthenticateCheck, auth.redisCheck);
 
 router.get('/info', (req, res, next) => {
 
-  global.socket.write(`\\t{"type": "GET"}\\n`);
+  global.socket.write(`\t{"type": "GET"}\n`);
 
   let classroom = 1;
 
@@ -55,9 +55,9 @@ router.get('/info', (req, res, next) => {
 
 router.post('/operation', (req, res, next) => {
 
-  global.socket.write(`\\t{
+  global.socket.write(`\t{
     "type": "SET_TURN_${req.body.type}", "host":"${req.body.host}", "seq": "${req.body.seq}"}
-  }\\n`);
+  }\n`);
 
   global.socket.once('data', function (data) {
     console.log(data.toString());
