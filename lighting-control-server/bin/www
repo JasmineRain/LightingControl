@@ -23,7 +23,7 @@ serverInterface.WLAN.forEach(function (item) {
     SERVERIP = item.address;
   }
 });
-console.log(serverInterface);
+//console.log(serverInterface);
 
 
 /**
@@ -36,10 +36,6 @@ app.set('port', port);
 //for socket server
 const SOCKETHOST = '0.0.0.0';       //定义服务器地址
 const SOCKETPORT = 4000;            //定义端口号
-
-//for UDP server
-const UDPHOST = '0.0.0.0';
-const UDPPORT = 4001;
 
 
 /**
@@ -81,6 +77,7 @@ socketServer.on('connection', function(socket) {
 
   //监听数据接收事件
   socket.on('data', function(data) {
+    //console.log(data.toString());
     console.log("receive data");
   });
 

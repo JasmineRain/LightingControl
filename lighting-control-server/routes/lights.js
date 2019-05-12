@@ -17,11 +17,18 @@ router.get('/info', (req, res, next) => {
 
   global.socket.write(`\t{"type": "GET"}\n`);
 
-  let classroom = 1;
-
   global.socket.once('data', function(data) {
+
+    let code = JSON.parse(data).status;
+    if(code === 'error'){
+      return res.send({
+        status: 500,
+        message: "获取灯光信息失败"
+      });
+    }
+
     //处理主机号序列号与行列号关系并返回
-    classroom = JSON.parse(data).classroom || 1;
+    let classroom = JSON.parse(data).classroom || 4;
     displayModel.findOne({classroom: classroom}, function (err, display) {
       let info = [];
       if(err) {
@@ -39,10 +46,22 @@ router.get('/info', (req, res, next) => {
           let e = d.find(function (element) {
             return element.host === item.host && element.seq === item.seq;
           });
-          info.push({
-            row: e.row, col: e.col, sw: item.sw === 1 ?  1 : 0, host: item.host, seq: item.seq
-          })
+          if(e) {
+            info.push({
+              row: e.row, col: e.col, sw: item.sw === 1 ?  1 : 0, host: item.host, seq: item.seq
+            })
+          }
         });
+
+        // //加入开关位置
+        // let switcher = d.find(function (element) {
+        //   return element.value === 2;
+        // });
+        // if(switcher) {
+        //   info.push({
+        //     row: switcher.row, col: switcher.col, sw: switcher.value
+        //   })
+        // }
       }
       res.send({
         status: 200,
@@ -55,17 +74,45 @@ router.get('/info', (req, res, next) => {
 
 router.post('/operation', (req, res, next) => {
 
-  global.socket.write(`\t{
-    "type": "SET_TURN_${req.body.type}", "host":"${req.body.host}", "seq": "${req.body.seq}"}
-  }\n`);
+  if(req.body.type === 'ON_ALL' || req.body.type === 'OFF_ALL') {
+    global.socket.write( `\t { "type": "SET_TURN_${req.body.type}" } \n` );
 
-  global.socket.once('data', function (data) {
-    console.log(data.toString());
-    res.send({
-      status: 200,
-      message: '设置灯光成功'
+    global.socket.once('data', function (data) {
+
+      let code = JSON.parse(data).status;
+      if(code === 'error'){
+        return res.send({
+          status: 500,
+          message: "设置灯光失败"
+        });
+      }
+
+      res.send({
+        status: 200,
+        message: '设置灯光成功'
+      })
     })
-  })
+
+  }else {
+    global.socket.write(`\t{"type": "SET_TURN_${req.body.type}", "host":${req.body.host}, "seq": ${req.body.seq}}}\n`);
+
+    global.socket.once('data', function (data) {
+
+      let code = JSON.parse(data).status;
+      if(code === 'error'){
+        return res.send({
+          status: 500,
+          message: "设置灯光失败"
+        });
+      }
+
+      res.send({
+        status: 200,
+        message: '设置灯光成功'
+      })
+    })
+  }
+
 });
 
 router.post('/new', (req, res, next) => {

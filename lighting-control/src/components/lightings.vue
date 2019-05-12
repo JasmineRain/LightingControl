@@ -33,10 +33,10 @@
                 <div class="row" v-for="(row, rindex) in rect">
                   <div class="col" v-for="(col, cindex) in row">
                     <!--<text>aaa</text>-->
-                    <image v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
-                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
-                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
-                    <image v-if="col === 3" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
+                    <image v-if="col === -1" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
+                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
+                    <image @click="clickBulb({row: cindex + 1, col: rindex + 1, value: col})" v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
+                    <image v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
                   </div>
                 </div>
               </scroller>
@@ -72,12 +72,10 @@
         let rmax = 0;
         let cmax = 0;
         data.forEach(function (item) {
-          if (item.sw === 1 || item.sw === 2 || item.sw === 3) {
-            if (item.row > rmax)
-              rmax = item.row;
-            if (item.col > cmax)
-              cmax = item.col;
-          }
+          if (item.row > rmax)
+            rmax = item.row;
+          if (item.col > cmax)
+            cmax = item.col;
         });
         return {row: rmax, col: cmax};
       },
@@ -210,7 +208,7 @@
         }
         for(let i =0; i<size.col; i++) {
           for(let j =0; j<size.row; j++){
-            bulbs[i][j] = 0;
+            bulbs[i][j] = -1;
           }
         }
         //row=5  col=6

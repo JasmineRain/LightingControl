@@ -15,10 +15,10 @@
           <scroller class="elevator" show-scrollbar="false" scroll-direction="horizontal">
             <div class="row" v-for="(row, rindex) in rect">
               <div class="col" v-for="(col, cindex) in row">
-                <image v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
-                <image v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
-                <image v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
-                <image v-if="col === 3" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
+                <image v-if="col === -1" style="width: 120px; height: 120px; margin: 20px" src="#"></image>
+                <image v-if="col === 0" style="width: 120px; height: 120px; margin: 20px" :src="offSrc"></image>
+                <image v-if="col === 1" style="width: 120px; height: 120px; margin: 20px" :src="onSrc"></image>
+                <image v-if="col === 2" style="width: 120px; height: 120px; margin: 20px" :src="switcherSrc"></image>
               </div>
             </div>
           </scroller>
@@ -55,8 +55,8 @@
           <div class="text">设备</div>
           <wxc-stepper :default-value="1"
                        step="1"
-                       min="1"
-                       max="3"
+                       min="-1"
+                       max="2"
                        @wxcStepperValueChanged="setValue">
           </wxc-stepper>
         </div>
@@ -242,7 +242,7 @@
         }
         for(let i =0; i<size.col; i++) {
           for(let j =0; j<size.row; j++){
-            bulbs[i][j] = 0;
+            bulbs[i][j] = -1;
           }
         }
         //row=5  col=6
