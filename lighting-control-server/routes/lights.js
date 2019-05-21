@@ -20,12 +20,17 @@ router.get('/info', (req, res, next) => {
   global.socket.once('data', function(data) {
 
     let code = JSON.parse(data).status;
+
+    console.log(data.toString());
+
     if(code === 'error'){
       return res.send({
         status: 500,
         message: "获取灯光信息失败"
       });
     }
+
+    console.log(data.toString());
 
     //处理主机号序列号与行列号关系并返回
     let classroom = JSON.parse(data).classroom || 4;
@@ -79,6 +84,8 @@ router.post('/operation', (req, res, next) => {
 
     global.socket.once('data', function (data) {
 
+      console.log(data.toString());
+
       let code = JSON.parse(data).status;
       if(code === 'error'){
         return res.send({
@@ -86,6 +93,8 @@ router.post('/operation', (req, res, next) => {
           message: "设置灯光失败"
         });
       }
+
+      console.log(data.toString());
 
       res.send({
         status: 200,
@@ -105,6 +114,8 @@ router.post('/operation', (req, res, next) => {
           message: "设置灯光失败"
         });
       }
+
+      console.log(data.toString());
 
       res.send({
         status: 200,
